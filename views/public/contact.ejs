@@ -1,0 +1,60 @@
+<%- include('layout', { title, body: `
+  <section class="py-5">
+    <div class="container">
+      <h1 class="mb-4">Contact & Locations</h1>
+      <div class="row">
+        <div class="col-md-6">
+          <h3>Contact Form</h3>
+          <p class="small">Send us your queries or feedback. This can be wired to send emails using SMTP.</p>
+          <form>
+            <div class="mb-3">
+              <label class="form-label">Name</label>
+              <input type="text" class="form-control" required />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-control" required />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Message</label>
+              <textarea class="form-control" rows="4" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Send</button>
+          </form>
+        </div>
+        <div class="col-md-6">
+          <h3>National Office</h3>
+          <p>
+            Social & Charity Organization<br />
+            National Karyalaya, New Delhi, India<br />
+            Phone: +91-11-1234-5678<br />
+            Email: info@yourorg.org
+          </p>
+          <h4 class="mt-4">State Branches</h4>
+          <ul class="small">
+            <li>Maharashtra – Mumbai, Pune, Nagpur</li>
+            <li>Uttar Pradesh – Lucknow, Varanasi, Kanpur</li>
+            <li>Tamil Nadu – Chennai, Coimbatore, Madurai</li>
+            <li>Assam – Guwahati, Dibrugarh, Silchar</li>
+            <li>… and many more across India</li>
+          </ul>
+
+          <h4 class="mt-4">Interactive Map</h4>
+          <p class="small">
+            Integrate Google Maps here to show all local chapters with markers.
+          </p>
+          <div class="ratio ratio-16x9">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3502.199540716501!2d77.215!3d28.619!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjjCsDM3JzA4LjQiTiA3N8KwMTInNTQuMCJF!5e0!3m2!1sen!2sin!4v1616580000000!5m2!1sen!2sin"
+              style="border:0;"
+              allowfullscreen=""
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+            ></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+` }) %>
+

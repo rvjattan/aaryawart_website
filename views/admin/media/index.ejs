@@ -1,0 +1,53 @@
+<%- include('../layout', { title, user, body: `
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Media Library</h3>
+    <form method="get" class="d-flex gap-2">
+      <select name="type" class="form-select form-select-sm">
+        <option value="">All types</option>
+        <option value="image/" ${filters.type && filters.type.startsWith('image/') ? 'selected' : ''}>Images</option>
+        <option value="video/" ${filters.type && filters.type.startsWith('video/') ? 'selected' : ''}>Videos</option>
+        <option value="application/pdf" ${filters.type === 'application/pdf' ? 'selected' : ''}>PDFs</option>
+      </select>
+      <button class="btn btn-sm btn-outline-primary" type="submit">Filter</button>
+    </form>
+  </div>
+
+  <form method="post" action="/admin/media/upload" enctype="multipart/form-data" class="mb-4">
+    <div class="mb-2">
+      <label class="form-label">Upload Files</label>
+      <input type="file" name="files" class="form-control" multiple />
+    </div>
+    <button class="btn btn-primary btn-sm">Upload</button>
+  </form>
+
+  <div class="row row-cols-2 row-cols-md-4 g-3">
+    ${data.map(m => `
+      <div class="col">
+        <div class="card h-100">
+          ${m.file_type.startsWith('image/')
+            ? `<img src="${m.file_path}" class="card-img-top" alt="${m.filename}" />`
+            : `<div class="card-body"><p class="card-text">${m.filename}</p></div>`
+          }
+          <div class="card-footer d-flex justify-content-between align-items-center">
+            <small class="text-muted">${new Date(m.uploaded_at).toLocaleDateString()}</small>
+            <form method="post" action="/admin/media/${m.id}/delete" onsubmit="return confirm('Delete this file?');">
+              <button class="btn btn-sm btn-outline-danger">Delete</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    `).join('')}
+  </div>
+
+  <nav class="mt-3">
+    <ul class="pagination">
+      ${Array.from({ length: Math.ceil(total / limit) || 1 }).map((_, i) => {
+        const p = i + 1;
+        const active = p === page ? 'active' : '';
+        const params = new URLSearchParams({ ...filters, page: String(p) }).toString();
+        return `<li class="page-item ${active}"><a class="page-link" href="?${params}">${p}</a></li>`;
+      }).join('')}
+    </ul>
+  </nav>
+` }) %>
+

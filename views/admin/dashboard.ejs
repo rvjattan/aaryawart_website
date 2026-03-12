@@ -1,0 +1,56 @@
+<%- include('layout', { title, user, body: `
+  <div class="row">
+    <div class="col-md-3">
+      <div class="card text-bg-primary mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Total Volunteers</h5>
+          <p class="card-text fs-3 fw-bold">${stats.totalVolunteers}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-bg-success mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Total Blogs</h5>
+          <p class="card-text fs-3 fw-bold">${stats.totalBlogs}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <h4>Recent Volunteers</h4>
+      <table class="table table-sm">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>State</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${recentVolunteers.map(v => `
+            <tr>
+              <td>${v.name}</td>
+              <td>${v.email}</td>
+              <td>${v.state || ''}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div class="col-md-6">
+      <h4>Recent Blogs</h4>
+      <ul class="list-group">
+        ${recentBlogs.map(b => `
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span>${b.title}</span>
+            <span class="badge bg-secondary rounded-pill">${b.publish_date}</span>
+          </li>
+        `).join('')}
+      </ul>
+    </div>
+  </div>
+` }) %>
+

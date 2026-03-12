@@ -1,0 +1,65 @@
+<%- include('../layout', { title, user, body: `
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Blog Posts</h3>
+    <a href="/admin/blogs/new" class="btn btn-primary btn-sm">New Post</a>
+  </div>
+
+  <form class="row g-2 mb-3" method="get">
+    <div class="col-auto">
+      <select name="status" class="form-select form-select-sm">
+        <option value="">All statuses</option>
+        <option value="PUBLISHED" ${filters.status === 'PUBLISHED' ? 'selected' : ''}>Published</option>
+        <option value="DRAFT" ${filters.status === 'DRAFT' ? 'selected' : ''}>Draft</option>
+      </select>
+    </div>
+    <div class="col-auto">
+      <button class="btn btn-sm btn-outline-primary" type="submit">Filter</button>
+    </div>
+  </form>
+
+  <table class="table table-striped table-sm">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Category</th>
+        <th>Author</th>
+        <th>Publish Date</th>
+        <th>Status</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      ${data.map(b => `
+        <tr>
+          <td>${b.title}</td>
+          <td>${b.category || ''}</td>
+          <td>${b.author}</td>
+          <td>${b.publish_date}</td>
+          <td>
+            <span class="badge ${b.status === 'PUBLISHED' ? 'bg-success' : 'bg-secondary'}">
+              ${b.status}
+            </span>
+          </td>
+          <td class="text-end">
+            <a href="/admin/blogs/${b.id}/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
+            <form method="post" action="/admin/blogs/${b.id}/delete" style="display:inline" onsubmit="return confirm('Delete this blog post?');">
+              <button class="btn btn-sm btn-outline-danger">Delete</button>
+            </form>
+          </td>
+        </tr>
+      `).join('')}
+    </tbody>
+  </table>
+
+  <nav>
+    <ul class="pagination">
+      ${Array.from({ length: Math.ceil(total / limit) || 1 }).map((_, i) => {
+        const p = i + 1;
+        const active = p === page ? 'active' : '';
+        const params = new URLSearchParams({ ...filters, page: String(p) }).toString();
+        return `<li class="page-item ${active}"><a class="page-link" href="?${params}">${p}</a></li>`;
+      }).join('')}
+    </ul>
+  </nav>
+` }) %>
+

@@ -1,0 +1,63 @@
+<%- include('layout', { title, body: `
+  <section class="py-5">
+    <div class="container">
+      <h1 class="mb-4">Media & Publications</h1>
+
+      <h2 class="mb-3">Blog & News</h2>
+      <p class="small">Latest blog posts and news can be managed from the admin panel and displayed here via API integration.</p>
+      <p class="small text-muted">For a full implementation, fetch /api/blogs via JavaScript and render cards.</p>
+
+      <hr class="my-4" />
+
+      <h2 class="mb-3">Photo Gallery</h2>
+      <div class="row row-cols-2 row-cols-md-4 g-3">
+        <div class="col">
+          <img src="/static/images/gallery1.jpg" class="img-fluid rounded" alt="Gallery 1" />
+        </div>
+        <div class="col">
+          <img src="/static/images/gallery2.jpg" class="img-fluid rounded" alt="Gallery 2" />
+        </div>
+        <div class="col">
+          <img src="/static/images/gallery3.jpg" class="img-fluid rounded" alt="Gallery 3" />
+        </div>
+        <div class="col">
+          <img src="/static/images/gallery4.jpg" class="img-fluid rounded" alt="Gallery 4" />
+        </div>
+      </div>
+
+      <hr class="my-4" />
+
+      <h2 class="mb-3">Video Gallery</h2>
+      <div class="row row-cols-1 row-cols-md-2 g-3">
+        <div class="col">
+          <div class="ratio ratio-16x9">
+            <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Video 1" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="col">
+          <div class="ratio ratio-16x9">
+            <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Video 2" allowfullscreen></iframe>
+          </div>
+        </div>
+      </div>
+
+      <hr class="my-4" />
+
+      <h2 class="mb-3">Publications</h2>
+      <ul>
+        <li><a href="/static/docs/newsletter-jan-2024.pdf" target="_blank">Monthly Newsletter - Jan 2024</a></li>
+        <li><a href="/static/docs/newsletter-dec-2023.pdf" target="_blank">Monthly Newsletter - Dec 2023</a></li>
+        <li><a href="/static/docs/magazine-2023.pdf" target="_blank">Annual Magazine 2023</a></li>
+      </ul>
+
+      <hr class="my-4" />
+
+      <h2 class="mb-3">Media Coverage & Speeches</h2>
+      <p class="small">
+        Archive of press clippings, media interviews, and keynote speeches can be linked here as PDF, audio,
+        or video, using the media library in the admin panel.
+      </p>
+    </div>
+  </section>
+` }) %>
+

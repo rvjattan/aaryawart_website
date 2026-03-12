@@ -1,0 +1,35 @@
+<%- include('../layout', { title, user, body: `
+  <h3>User Management</h3>
+  <table class="table table-striped table-sm">
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Created</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      ${admins.map(a => `
+        <tr>
+          <td>${a.username}</td>
+          <td>${a.email}</td>
+          <td>${a.role}</td>
+          <td>${new Date(a.created_at).toLocaleDateString()}</td>
+          <td>
+            <form method="post" action="/admin/users/${a.id}/role" class="d-flex gap-1">
+              <select name="role" class="form-select form-select-sm">
+                <option value="SUPER_ADMIN" ${a.role === 'SUPER_ADMIN' ? 'selected' : ''}>Super Admin</option>
+                <option value="EDITOR" ${a.role === 'EDITOR' ? 'selected' : ''}>Editor</option>
+                <option value="MODERATOR" ${a.role === 'MODERATOR' ? 'selected' : ''}>Moderator</option>
+              </select>
+              <button class="btn btn-sm btn-outline-primary">Update</button>
+            </form>
+          </td>
+        </tr>
+      `).join('')}
+    </tbody>
+  </table>
+` }) %>
+

@@ -1,0 +1,60 @@
+<%- include('../layout', { title, user, body: `
+  <h3>${mode === 'create' ? 'New' : 'Edit'} Blog Post</h3>
+  <form method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+      <label class="form-label">Title</label>
+      <input type="text" name="title" class="form-control" required value="${post.title || ''}" />
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Featured Image</label>
+      <input type="file" name="featured_image" class="form-control" />
+      ${post.featured_image ? `<small>Current: <a href="${post.featured_image}" target="_blank">View</a></small>` : ''}
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Category</label>
+      <select name="category" class="form-select">
+        <option value="">Select category</option>
+        <option value="Education" ${post.category === 'Education' ? 'selected' : ''}>Education</option>
+        <option value="Healthcare" ${post.category === 'Healthcare' ? 'selected' : ''}>Healthcare</option>
+        <option value="Rural Development" ${post.category === 'Rural Development' ? 'selected' : ''}>Rural Development</option>
+        <option value="Women Empowerment" ${post.category === 'Women Empowerment' ? 'selected' : ''}>Women Empowerment</option>
+        <option value="Youth" ${post.category === 'Youth' ? 'selected' : ''}>Youth</option>
+        <option value="Environment" ${post.category === 'Environment' ? 'selected' : ''}>Environment</option>
+        <option value="Culture" ${post.category === 'Culture' ? 'selected' : ''}>Culture</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Author</label>
+      <input type="text" name="author" class="form-control" required value="${post.author || user.username}" />
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Publish Date</label>
+      <input type="date" name="publish_date" class="form-control" required value="${post.publish_date ? String(post.publish_date).substring(0,10) : ''}" />
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Status</label>
+      <select name="status" class="form-select">
+        <option value="DRAFT" ${post.status === 'DRAFT' ? 'selected' : ''}>Draft</option>
+        <option value="PUBLISHED" ${post.status === 'PUBLISHED' ? 'selected' : ''}>Published</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Content</label>
+      <textarea name="content" id="editor" class="form-control" rows="10">${post.content || ''}</textarea>
+    </div>
+    <button class="btn btn-primary">Save</button>
+    <a href="/admin/blogs" class="btn btn-secondary">Cancel</a>
+  </form>
+
+  <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+  <script>
+    tinymce.init({
+      selector: '#editor',
+      menubar: false,
+      plugins: 'link lists',
+      toolbar: 'undo redo | bold italic underline | bullist numlist | link',
+      height: 400
+    });
+  </script>
+` }) %>
+

@@ -1,0 +1,37 @@
+{
+  "name": "charity-website",
+  "version": "1.0.0",
+  "description": "Social and charity organization website (public site + admin panel) built with Node.js, Express, MySQL, and EJS.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "seed-admin": "node scripts/create_admin.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "body-parser": "^2.2.2",
+    "cookie-parse": "^0.4.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "csurf": "^1.11.0",
+    "dotenv": "^16.6.1",
+    "ejs": "^3.1.10",
+    "express": "^4.22.1",
+    "express-fileupload": "^1.5.2",
+    "express-session": "^1.19.0",
+    "express-validator": "^7.3.1",
+    "helmet": "^7.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "mysql2": "^3.16.3",
+    "nodemailer": "^6.10.1",
+    "razorpay": "^2.9.6"
+  }
+}

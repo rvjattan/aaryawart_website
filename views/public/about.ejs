@@ -1,0 +1,117 @@
+<%- include('layout', { title, body: `
+  <section class="py-5">
+    <div class="container">
+      <h1 class="mb-4">About Us</h1>
+      <div class="row">
+        <div class="col-md-8">
+          <h3>Our History</h3>
+          <p>
+            Founded by dedicated social workers and cultural leaders, our organization has grown from a small circle
+            of volunteers into a nationwide movement working in thousands of villages and towns.
+          </p>
+          <ul class="timeline">
+            <li>
+              <div class="timeline-year">1980s</div>
+              <div class="timeline-content">Grassroots seva activities begin in select districts.</div>
+            </li>
+            <li>
+              <div class="timeline-year">1990s</div>
+              <div class="timeline-content">Expansion into education, health, and rural development programs.</div>
+            </li>
+            <li>
+              <div class="timeline-year">2000s</div>
+              <div class="timeline-content">Nationwide volunteer network; large-scale disaster relief operations.</div>
+            </li>
+            <li>
+              <div class="timeline-year">2010s</div>
+              <div class="timeline-content">Women empowerment, youth leadership, and environmental initiatives amplified.</div>
+            </li>
+            <li>
+              <div class="timeline-year">2020s</div>
+              <div class="timeline-content">Digital outreach, e-learning, telemedicine, and global partnerships.</div>
+            </li>
+          </ul>
+        </div>
+        <div class="col-md-4">
+          <h3>Core Values</h3>
+          <ul class="list-group mb-3">
+            <li class="list-group-item">Selfless Service (Seva)</li>
+            <li class="list-group-item">National Integration</li>
+            <li class="list-group-item">Cultural Heritage</li>
+            <li class="list-group-item">Social Harmony</li>
+            <li class="list-group-item">Empowerment of the Marginalized</li>
+          </ul>
+          <h3>Leadership</h3>
+          <p class="small">
+            The organization is guided by an all-India governing body, state-level committees, and local coordinators,
+            supported by thematic panels for education, health, women, youth, and environment.
+          </p>
+        </div>
+      </div>
+
+      <hr class="my-5" />
+
+      <h2 class="mb-3">Leadership & Team</h2>
+      <div class="row row-cols-1 row-cols-md-3 g-3">
+        <div class="col">
+          <div class="card h-100 text-center">
+            <img src="/static/images/leader1.jpg" class="card-img-top" alt="Leader 1" />
+            <div class="card-body">
+              <h5 class="card-title">Shri A. Sharma</h5>
+              <p class="card-text small">National President</p>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card h-100 text-center">
+            <img src="/static/images/leader2.jpg" class="card-img-top" alt="Leader 2" />
+            <div class="card-body">
+              <h5 class="card-title">Dr. B. Iyer</h5>
+              <p class="card-text small">General Secretary</p>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card h-100 text-center">
+            <img src="/static/images/leader3.jpg" class="card-img-top" alt="Leader 3" />
+            <div class="card-body">
+              <h5 class="card-title">Smt. C. Devi</h5>
+              <p class="card-text small">Women & Family Affairs</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <hr class="my-5" />
+
+      <h2 class="mb-3">Organizational Structure</h2>
+      <div class="org-chart">
+        <div class="org-level">National Council</div>
+        <div class="org-connector">↓</div>
+        <div class="org-level">State Councils</div>
+        <div class="org-connector">↓</div>
+        <div class="org-level">District Committees</div>
+        <div class="org-connector">↓</div>
+        <div class="org-level">Taluka / Block Teams</div>
+        <div class="org-connector">↓</div>
+        <div class="org-level">Village / Ward Units</div>
+      </div>
+
+      <hr class="my-5" />
+
+      <h2 class="mb-3">Annual Reports & Partners</h2>
+      <p>Download recent annual reports (sample placeholders, replace with real PDFs):</p>
+      <ul>
+        <li><a href="/static/docs/annual-report-2023.pdf" target="_blank">Annual Report 2023</a></li>
+        <li><a href="/static/docs/annual-report-2022.pdf" target="_blank">Annual Report 2022</a></li>
+      </ul>
+
+      <h3 class="mt-4">Affiliates & Partners</h3>
+      <p class="small">
+        The organization works closely with like-minded social service institutions, hospitals, educational trusts,
+        and corporate social responsibility (CSR) partners across India and abroad.
+      </p>
+    </div>
+  </section>
+` }) %>
+

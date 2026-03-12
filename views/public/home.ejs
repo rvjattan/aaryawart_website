@@ -1,0 +1,144 @@
+<%- include('layout', { title, body: `
+  <section class="hero-section text-white d-flex align-items-center" style="background-image: url('/static/images/hero.jpg');">
+    <div class="container py-5">
+      <div class="row align-items-center">
+        <div class="col-md-7">
+          <h1 class="display-5 fw-bold mb-3">Serving Society, Preserving Culture, Empowering Communities</h1>
+          <p class="lead mb-4">
+            A nationwide volunteer movement working in education, healthcare, rural development,
+            women empowerment, disaster relief, and cultural preservation.
+          </p>
+          <div class="d-flex flex-wrap gap-2">
+            <a href="/get-involved" class="btn btn-light btn-lg">Join Us</a>
+            <a href="/get-involved#donate" class="btn btn-outline-light btn-lg">Donate</a>
+            <a href="/about" class="btn btn-outline-light btn-lg">Learn More</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-5">
+    <div class="container">
+      <div class="row text-center">
+        <div class="col-md-4 mb-3">
+          <h3>Our Mission</h3>
+          <p>
+            To build a harmonious, self-reliant, and compassionate society through organized, selfless service rooted in timeless values.
+          </p>
+        </div>
+        <div class="col-md-4 mb-3">
+          <h3>Our Vision</h3>
+          <p>
+            A nation where every individual is empowered, every village is vibrant, and cultural heritage guides modern progress.
+          </p>
+        </div>
+        <div class="col-md-4 mb-3">
+          <h3>Our Approach</h3>
+          <p>
+            Grassroots initiatives led by trained volunteers, in partnership with communities, institutions, and well-wishers worldwide.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-5 bg-light">
+    <div class="container">
+      <h2 class="text-center mb-4">Our Impact</h2>
+      <div class="row text-center">
+        <div class="col-md-4 mb-3">
+          <div class="impact-card">
+            <div class="impact-number" id="counter-volunteers">0</div>
+            <div class="impact-label">Active Volunteers</div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <div class="impact-card">
+            <div class="impact-number" id="counter-projects">0</div>
+            <div class="impact-label">Projects Completed</div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <div class="impact-card">
+            <div class="impact-number" id="counter-lives">0</div>
+            <div class="impact-label">Lives Impacted</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-8">
+          <h2 class="mb-3">Latest Activities</h2>
+          ${latestBlogs.length === 0
+            ? '<p>No recent activities yet.</p>'
+            : '<div class="list-group">' +
+              latestBlogs.map(b => `
+                <a href="/media#blog-${b.id}" class="list-group-item list-group-item-action">
+                  <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">${b.title}</h5>
+                    <small>${b.publish_date}</small>
+                  </div>
+                  <p class="mb-1">${(b.content || '').replace(/<[^>]+>/g, '').substring(0, 150)}...</p>
+                  <small>${b.category || ''} · ${b.author}</small>
+                </a>
+              `).join('') +
+              '</div>'
+          }
+        </div>
+        <div class="col-md-4">
+          <h2 class="mb-3">Testimonials</h2>
+          <div class="testimonial mb-3">
+            <p>"Volunteering here has given my life a new purpose and connected me deeply with local communities."</p>
+            <small class="text-muted">– Ananya, Youth Volunteer</small>
+          </div>
+          <div class="testimonial mb-3">
+            <p>"Their rural development programs have transformed our village schools and health centers."</p>
+            <small class="text-muted">– Village Sarpanch, Maharashtra</small>
+          </div>
+          <div class="testimonial">
+            <p>"In times of disaster, their teams are among the first to reach and the last to leave."</p>
+            <small class="text-muted">– District Collector, Assam</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // Fetch impact counters from API
+    fetch('/api/stats')
+      .then(r => r.json())
+      .then(res => {
+        if (!res.success) return;
+        const stats = res.data || {};
+        const v = stats.volunteers_registered || 0;
+        const p = stats.projects_completed || 0;
+        const l = stats.lives_impacted || 0;
+        animateCounter('counter-volunteers', v);
+        animateCounter('counter-projects', p);
+        animateCounter('counter-lives', l);
+      })
+      .catch(() => {});
+
+    function animateCounter(id, target) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      let current = 0;
+      const duration = 1200;
+      const start = performance.now();
+      function tick(now) {
+        const progress = Math.min(1, (now - start) / duration);
+        current = Math.floor(progress * target);
+        el.textContent = current.toLocaleString();
+        if (progress < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    }
+  </script>
+` }) %>
+
