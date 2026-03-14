@@ -11,8 +11,11 @@ const mediaModel = require('../models/mediaModel');
 
 const router = express.Router();
 
-// Multer setup for uploads
-const uploadDir = path.join(__dirname, '..', 'uploads');
+// ✅ Use /tmp on Vercel (the only writable directory), local path otherwise
+const uploadDir = process.env.VERCEL
+  ? '/tmp/uploads'
+  : path.join(__dirname, '..', 'uploads');
+
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
