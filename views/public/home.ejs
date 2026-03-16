@@ -123,7 +123,12 @@
         animateCounter('counter-projects', p);
         animateCounter('counter-lives', l);
       })
-      .catch(() => {});
+      .catch(() => {
+        // API failed entirely — animate with hardcoded values
+        animateCounter('counter-volunteers', 2719);
+        animateCounter('counter-projects', 3);
+        animateCounter('counter-lives', 50000);
+      });
 
     function animateCounter(id, target) {
       const el = document.getElementById(id);
