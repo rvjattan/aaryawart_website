@@ -48,23 +48,23 @@
       <h2 class="text-center mb-4">Our Impact</h2>
       <div class="row text-center">
         <div class="col-md-4 mb-3">
-          <div class="impact-card">
-            <div class="impact-number" id="counter-volunteers">2719</div>
-            <div class="impact-label">Active Volunteers</div>
-          </div>
+        <div class="impact-card">
+          <div class="impact-number">${stats.volunteers_registered || 2719}</div>
+          <div class="impact-label">Active Volunteers</div>
         </div>
-        <div class="col-md-4 mb-3">
-          <div class="impact-card">
-            <div class="impact-number" id="counter-projects">3</div>
-            <div class="impact-label">Projects Completed</div>
-          </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <div class="impact-card">
+          <div class="impact-number">${stats.projects_completed || 3}</div>
+          <div class="impact-label">Projects Completed</div>
         </div>
-        <div class="col-md-4 mb-3">
-          <div class="impact-card">
-            <div class="impact-number" id="counter-lives">50000+</div>
-            <div class="impact-label">Lives Impacted</div>
-          </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <div class="impact-card">
+          <div class="impact-number">${stats.lives_impacted || 50000}</div>
+          <div class="impact-label">Lives Impacted</div>
         </div>
+      </div>
       </div>
     </div>
   </section>
@@ -108,42 +108,5 @@
       </div>
     </div>
   </section>
-
-  <script>
-    // Fetch impact counters from API
-    fetch('/api/stats')
-      .then(r => r.json())
-      .then(res => {
-        if (!res.success) return;
-        const stats = res.data || {};
-        const v = stats.volunteers_registered || 2719;
-        const p = stats.projects_completed || 3;
-        const l = stats.lives_impacted || 50000;
-        animateCounter('counter-volunteers', v);
-        animateCounter('counter-projects', p);
-        animateCounter('counter-lives', l);
-      })
-      .catch(() => {
-        // API failed entirely — animate with hardcoded values
-        animateCounter('counter-volunteers', 2719);
-        animateCounter('counter-projects', 3);
-        animateCounter('counter-lives', 50000);
-      });
-
-    function animateCounter(id, target) {
-      const el = document.getElementById(id);
-      if (!el) return;
-      let current = 0;
-      const duration = 1200;
-      const start = performance.now();
-      function tick(now) {
-        const progress = Math.min(1, (now - start) / duration);
-        current = Math.floor(progress * target);
-        el.textContent = current.toLocaleString();
-        if (progress < 1) requestAnimationFrame(tick);
-      }
-      requestAnimationFrame(tick);
-    }
-  </script>
 ` }) %>
 
