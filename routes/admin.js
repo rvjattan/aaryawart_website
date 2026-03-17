@@ -8,6 +8,8 @@ const { findByUsername, listAdmins, updateAdminRole } = require('../models/admin
 const volunteerModel = require('../models/volunteerModel');
 const blogModel = require('../models/blogModel');
 const mediaModel = require('../models/mediaModel');
+const siteSettingsModel = require('../models/siteSettingsModel');
+const contentModel = require('../models/contentModel');
 
 const router = express.Router();
 
@@ -407,6 +409,135 @@ router.post('/users/:id/role', roleRequired(['SUPER_ADMIN']), async (req, res, n
     const { role } = req.body;
     await updateAdminRole(req.params.id, role);
     res.redirect('/admin/users');
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Site settings (global header/footer/ticker)
+router.get('/settings', roleRequired(['SUPER_ADMIN']), async (req, res, next) => {
+  try {
+    const settings = await siteSettingsModel.getSettings({
+      site_name: '',
+      site_tagline: '',
+      header_logo_url: '',
+      news_ticker_text: '',
+      footer_about: '',
+      footer_contact: '',
+      footer_quick_links_json: '',
+      social_links_json: '',
+    });
+    res.render('admin/settings', {
+      title: 'Site Settings',
+      user: req.user,
+      settings,
+      message: null,
+      error: null,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/settings', roleRequired(['SUPER_ADMIN']), async (req, res, next) => {
+  try {
+    const {
+      site_name,
+      site_tagline,
+      header_logo_url,
+      news_ticker_text,
+      footer_about,
+      footer_contact,
+      footer_quick_links_json,
+      social_links_json,
+    } = req.body;
+    await siteSettingsModel.setSettings({
+      site_name: site_name || '',
+      site_tagline: site_tagline || '',
+      header_logo_url: header_logo_url || '',
+      news_ticker_text: news_ticker_text || '',
+      footer_about: footer_about || '',
+      footer_contact: footer_contact || '',
+      footer_quick_links_json: footer_quick_links_json || '',
+      social_links_json: social_links_json || '',
+    });
+    const settings = await siteSettingsModel.getSettings({
+      site_name: '',
+      site_tagline: '',
+      header_logo_url: '',
+      news_ticker_text: '',
+      footer_about: '',
+      footer_contact: '',
+      footer_quick_links_json: '',
+      social_links_json: '',
+    });
+    res.render('admin/settings', {
+      title: 'Site Settings',
+      user: req.user,
+      settings,
+      message: 'Settings saved.',
+      error: null,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Home page content (hero, mission, vision, approach, testimonials)
+router.get('/content/home', roleRequired(['SUPER_ADMIN', 'EDITOR']), async (req, res, next) => {
+  try {
+    const hero = (await contentModel.getBlocks('home', 'hero'))[0] || null;
+    const mission = (await contentModel.getBlocks('home', 'mission'))[0] || null;
+    const vision = (await contentModel.getBlocks('home', 'vision'))[0] || null;
+    const approach = (await contentModel.getBlocks('home', 'approach'))[0] || null;
+    const testimonials = await contentModel.getBlocks('home', 'testimonials');
+    res.render('admin/content-home', {
+      title: 'Home Content',
+      user: req.user,
+      hero,
+      mission,
+      vision,
+      approach,
+      testimonials,
+      message: null,
+      error: null,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/content/home/section/:section', roleRequired(['SUPER_ADMIN', 'EDITOR']), async (req, res, next) => {
+  try {
+    const { section } = req.params;
+    const { id, title, body, extra_json } = req.body;
+    const page = 'home';
+    if (id) {
+      await contentModel.updateBlock(id, {
+        title,
+        body,
+        extra_json: extra_json || null,
+      });
+    } else {
+      await contentModel.createBlock({
+        page,
+        section,
+        title,
+        body,
+        extra_json: extra_json || null,
+        sort_order: 0,
+      });
+    }
+    res.redirect('/admin/content/home');
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/content/home/testimonials/:id/delete', roleRequired(['SUPER_ADMIN', 'EDITOR']), async (req, res, next) => {
+  try {
+    await contentModel.deleteBlock(req.params.id);
+    res.redirect('/admin/content/home');
   } catch (err) {
     next(err);
   }

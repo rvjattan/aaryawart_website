@@ -1,0 +1,56 @@
+<%- include('layout', { title, user, body: `
+  <div class="row">
+    <div class="col-md-8">
+      <div class="card mb-4">
+        <div class="card-header">Site Identity</div>
+        <div class="card-body">
+          <% if (message) { %>
+            <div class="alert alert-success"><%= message %></div>
+          <% } %>
+          <% if (error) { %>
+            <div class="alert alert-danger"><%= error %></div>
+          <% } %>
+          <form method="post" action="/admin/settings">
+            <div class="mb-3">
+              <label class="form-label">Site Name</label>
+              <input type="text" name="site_name" class="form-control" value="<%= settings.site_name || '' %>" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Tagline</label>
+              <input type="text" name="site_tagline" class="form-control" value="<%= settings.site_tagline || '' %>" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Header Logo URL</label>
+              <input type="text" name="header_logo_url" class="form-control" value="<%= settings.header_logo_url || '' %>" />
+              <div class="form-text">Use /static/images/... for uploaded logos.</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">News Ticker Text</label>
+              <textarea name="news_ticker_text" class="form-control" rows="2"><%= settings.news_ticker_text || '' %></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Footer About Text</label>
+              <textarea name="footer_about" class="form-control" rows="3"><%= settings.footer_about || '' %></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Footer Contact (one item per line)</label>
+              <textarea name="footer_contact" class="form-control" rows="3"><%= settings.footer_contact || '' %></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Footer Quick Links (JSON)</label>
+              <textarea name="footer_quick_links_json" class="form-control" rows="3"><%= settings.footer_quick_links_json || '' %></textarea>
+              <div class="form-text">Example: [{"label":"About Us","url":"/about"}, {"label":"Contact","url":"/contact"}]</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Social Links (JSON)</label>
+              <textarea name="social_links_json" class="form-control" rows="3"><%= settings.social_links_json || '' %></textarea>
+              <div class="form-text">Example: [{"id":"facebook","icon":"bi-facebook","url":"https://..."}, {"id":"instagram","icon":"bi-instagram","url":"https://..."}]</div>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Settings</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+` }) %>
+

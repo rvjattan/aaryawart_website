@@ -16,6 +16,8 @@ const apiRoutes = require('./routes/api');
 const adminRoutes = require('./routes/admin');
 const blogModel = require('./models/blogModel');
 const statsModel = require('./models/statsModel');
+const siteSettingsModel = require('./models/siteSettingsModel');
+const contentModel = require('./models/contentModel');
 
 const app = express();
 
@@ -37,6 +39,57 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+// Global site settings (header, footer, ticker) available to all views
+app.use(async (req, res, next) => {
+  try {
+    const defaults = {
+      site_name: 'Aaryawart Seva Nyaas',
+      site_tagline: 'Seva | Shiksha | Sahyog',
+      header_logo_url: '/static/images/logo.png',
+      news_ticker_text:
+        'Upcoming health camp in rural districts • National youth leadership workshop • Flood relief volunteer deployment • New education centers inaugurated',
+      footer_about:
+        'A nationwide social and cultural organization dedicated to selfless service, character building, and national integration through thousands of volunteers and grassroots projects.',
+      footer_contact:
+        '113, Shivalik Nagar, BHEL, Haridwar, UK, India (249403)\nEmail: aaryawartsevanyaas@gmail.com\nPhone: +91-9253999082, 9253999083',
+      footer_quick_links_json: JSON.stringify([
+        { label: 'About Us', url: '/about' },
+        { label: 'Activities', url: '/activities' },
+        { label: 'Media', url: '/media' },
+        { label: 'Volunteer / Donate', url: '/get-involved' },
+        { label: 'Contact', url: '/contact' },
+      ]),
+      social_links_json: JSON.stringify([
+        {
+          id: 'facebook',
+          icon: 'bi-facebook',
+          url: 'https://www.facebook.com/people/Aaryawart-Seva-Nyaas/61585981201970/',
+        },
+        {
+          id: 'twitter',
+          icon: 'bi-twitter-x',
+          url: 'https://x.com/aaryawartastro',
+        },
+        {
+          id: 'instagram',
+          icon: 'bi-instagram',
+          url: 'https://www.instagram.com/aaryawart_seva_nyaas/',
+        },
+        {
+          id: 'youtube',
+          icon: 'bi-youtube',
+          url: 'https://www.youtube.com/@aaryawartastroworld',
+        },
+        { id: 'linkedin', icon: 'bi-linkedin', url: 'https://linkedin.com' },
+      ]),
+    };
+    res.locals.settings = await siteSettingsModel.getSettings(defaults);
+  } catch (e) {
+    res.locals.settings = null;
+  }
+  next();
+});
+
 // Simple analytics: count page views for public pages
 app.use(async (req, res, next) => {
   try {
@@ -52,18 +105,42 @@ app.use(async (req, res, next) => {
 // Public pages
 app.get('/', async (req, res, next) => {
   try {
-    const [latestBlogs, stats] = await Promise.all([
+    const [
+      latestBlogs,
+      stats,
+      heroBlocks,
+      missionBlocks,
+      visionBlocks,
+      approachBlocks,
+      testimonialBlocks,
+    ] = await Promise.all([
       blogModel.getBlogs({ page: 1, limit: 3, status: 'PUBLISHED' }),
       statsModel.getMany([
         'volunteers_registered',
         'projects_completed',
         'lives_impacted',
       ]),
+      contentModel.getBlocks('home', 'hero'),
+      contentModel.getBlocks('home', 'mission'),
+      contentModel.getBlocks('home', 'vision'),
+      contentModel.getBlocks('home', 'approach'),
+      contentModel.getBlocks('home', 'testimonials'),
     ]);
+
+    const hero = heroBlocks[0] || null;
+    const mission = missionBlocks[0] || null;
+    const vision = visionBlocks[0] || null;
+    const approach = approachBlocks[0] || null;
+
     res.render('public/home', {
       title: 'Home',
       latestBlogs: latestBlogs.data,
       stats,
+      hero,
+      mission,
+      vision,
+      approach,
+      testimonials: testimonialBlocks,
     });
   } catch (err) {
     next(err);

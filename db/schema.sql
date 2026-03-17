@@ -90,6 +90,27 @@ CREATE TABLE IF NOT EXISTS donations (
   UNIQUE KEY uk_donations_razorpay_order (razorpay_order_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- Site-wide key/value settings (header, footer, page texts, etc.)
+CREATE TABLE IF NOT EXISTS site_settings (
+  settings_key VARCHAR(150) NOT NULL PRIMARY KEY,
+  settings_value TEXT NOT NULL,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Generic content blocks for repeatable items (timeline, testimonials, activities, branches, etc.)
+CREATE TABLE IF NOT EXISTS content_blocks (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  page VARCHAR(50) NOT NULL,
+  section VARCHAR(50) NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  body TEXT,
+  extra_json JSON NULL,
+  sort_order INT NOT NULL DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_content_page_section (page, section, sort_order)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- Create the first admin by running: node scripts/create_admin.js
 -- Default login: username 'superadmin', password 'admin123' (change in production)
 
