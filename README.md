@@ -1,6 +1,6 @@
-# Social & Charity Organization Website
+#  Aaryawart Seva Nyaas Website
 
-Full-stack website for a social and charity organization, including a public-facing site and an admin panel for managing volunteers, blogs, media, and basic analytics.
+Full-stack website, including a public-facing site and an admin panel for managing volunteers, blogs, media, and basic analytics.
 
 ## Tech Stack
 
