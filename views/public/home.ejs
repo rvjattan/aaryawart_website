@@ -3,10 +3,9 @@
     <div class="container py-5">
       <div class="row align-items-center">
         <div class="col-md-7">
-          <h1 class="display-5 fw-bold mb-3">Serving Society, Preserving Culture, Empowering Communities</h1>
+          <h1 class="display-5 fw-bold mb-3"><%= siteSettings.hero_title || 'Serving Society, Preserving Culture, Empowering Communities' %></h1>
           <p class="lead mb-4">
-            A nationwide volunteer movement working in education, healthcare, rural development,
-            women empowerment, disaster relief, and cultural preservation.
+            <%= siteSettings.hero_subtitle || 'A nationwide volunteer movement working in education, healthcare, rural development, women empowerment, disaster relief, and cultural preservation.' %>
           </p>
           <div class="d-flex flex-wrap gap-2">
             <a href="/get-involved" class="btn btn-light btn-lg">Join Us</a>
@@ -24,19 +23,19 @@
         <div class="col-md-4 mb-3">
           <h3>Our Mission</h3>
           <p>
-            To build a harmonious, self-reliant, and compassionate society through organized, selfless service rooted in timeless values.
+            <%= siteSettings.mission_statement || 'To build a harmonious, self-reliant, and compassionate society through organized, selfless service rooted in timeless values.' %>
           </p>
         </div>
         <div class="col-md-4 mb-3">
           <h3>Our Vision</h3>
           <p>
-            A nation where every individual is empowered, every village is vibrant, and cultural heritage guides modern progress.
+            <%= siteSettings.vision_statement || 'A nation where every individual is empowered, every village is vibrant, and cultural heritage guides modern progress.' %>
           </p>
         </div>
         <div class="col-md-4 mb-3">
           <h3>Our Approach</h3>
           <p>
-            Grassroots initiatives led by trained volunteers, in partnership with communities, institutions, and well-wishers worldwide.
+            <%= siteSettings.approach_statement || 'Grassroots initiatives led by trained volunteers, in partnership with communities, institutions, and well-wishers worldwide.' %>
           </p>
         </div>
       </div>
@@ -49,19 +48,19 @@
       <div class="row text-center">
         <div class="col-md-4 mb-3">
         <div class="impact-card">
-          <div class="impact-number">${stats.volunteers_registered || 2719}</div>
+          <div class="impact-number"><%= siteSettings.volunteers_impact || stats.volunteers_registered || 2719 %></div>
           <div class="impact-label">Active Volunteers</div>
         </div>
       </div>
       <div class="col-md-4 mb-3">
         <div class="impact-card">
-          <div class="impact-number">${stats.projects_completed || 3}</div>
+          <div class="impact-number"><%= siteSettings.projects_completed || stats.projects_completed || 3 %></div>
           <div class="impact-label">Projects Completed</div>
         </div>
       </div>
       <div class="col-md-4 mb-3">
         <div class="impact-card">
-          <div class="impact-number">${stats.lives_impacted || 50000}</div>
+          <div class="impact-number"><%= stats.lives_impacted || 50000 %></div>
           <div class="impact-label">Lives Impacted</div>
         </div>
       </div>
@@ -112,4 +111,3 @@
   <script src="/static/js/counters.js"></script>
 
 ` }) %>
-

@@ -16,6 +16,7 @@ const apiRoutes = require('./routes/api');
 const adminRoutes = require('./routes/admin');
 const blogModel = require('./models/blogModel');
 const statsModel = require('./models/statsModel');
+const siteSettingsModel = require('./models/siteSettingsModel');
 
 const app = express();
 
@@ -36,6 +37,21 @@ app.use(cors());
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+// Load site settings and make available globally
+app.use(async (req, res, next) => {
+  try {
+    if (!app.locals.siteSettings) {
+      app.locals.siteSettings = await siteSettingsModel.getAllSettings();
+    }
+    // Make settings available to all views
+    res.locals.siteSettings = app.locals.siteSettings;
+  } catch (e) {
+    console.error('Error loading site settings:', e);
+    res.locals.siteSettings = {};
+  }
+  next();
+});
 
 // Simple analytics: count page views for public pages
 app.use(async (req, res, next) => {

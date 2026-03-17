@@ -8,6 +8,7 @@ const { findByUsername, listAdmins, updateAdminRole } = require('../models/admin
 const volunteerModel = require('../models/volunteerModel');
 const blogModel = require('../models/blogModel');
 const mediaModel = require('../models/mediaModel');
+const siteSettingsModel = require('../models/siteSettingsModel');
 
 const router = express.Router();
 
@@ -407,6 +408,38 @@ router.post('/users/:id/role', roleRequired(['SUPER_ADMIN']), async (req, res, n
     const { role } = req.body;
     await updateAdminRole(req.params.id, role);
     res.redirect('/admin/users');
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Site Settings Management (Super Admin only)
+router.get('/settings', roleRequired(['SUPER_ADMIN']), async (req, res, next) => {
+  try {
+    const settings = await siteSettingsModel.getSettingsWithMetadata();
+    res.render('admin/settings', {
+      title: 'Site Settings',
+      user: req.user,
+      settings,
+      message: req.query.message || null,
+      error: req.query.error || null,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/settings', roleRequired(['SUPER_ADMIN']), async (req, res, next) => {
+  try {
+    const updates = req.body;
+    await siteSettingsModel.updateSettings(updates);
+    
+    // Clear cache if it exists
+    if (req.app.locals.siteSettings) {
+      req.app.locals.siteSettings = await siteSettingsModel.getAllSettings();
+    }
+    
+    res.redirect('/admin/settings?message=Settings updated successfully');
   } catch (err) {
     next(err);
   }

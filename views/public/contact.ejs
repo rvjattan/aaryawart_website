@@ -25,10 +25,16 @@
         <div class="col-md-6">
           <h3>National Office</h3>
           <p>
-            Social & Charity Organization<br />
-            National Karyalaya, New Delhi, India<br />
-            Phone: +91-11-1234-5678<br />
-            Email: info@yourorg.org
+            <strong><%= siteSettings.site_name || 'Organization' %></strong><br />
+            <% if (siteSettings.office_address) { %>
+              <%= siteSettings.office_address %><br />
+            <% } %>
+            <% if (siteSettings.contact_phone) { %>
+              Phone: <a href="tel:<%= siteSettings.contact_phone %>"><%= siteSettings.contact_phone %></a><br />
+            <% } %>
+            <% if (siteSettings.contact_email) { %>
+              Email: <a href="mailto:<%= siteSettings.contact_email %>"><%= siteSettings.contact_email %></a>
+            <% } %>
           </p>
           <h4 class="mt-4">State Branches</h4>
           <ul class="small">
@@ -57,4 +63,3 @@
     </div>
   </section>
 ` }) %>
-

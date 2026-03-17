@@ -1,0 +1,196 @@
+<%- include('layout', { title, user, body: `
+  <div class="row">
+    <div class="col-12">
+      <h1 class="mb-4">Site Settings</h1>
+      
+      <% if (message) { %>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+          <%= message %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      <% } %>
+      
+      <% if (error) { %>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <%= error %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      <% } %>
+      
+      <form method="POST" action="/admin/settings" class="card">
+        <div class="card-body">
+          <p class="text-muted mb-4">
+            Configure your website content without any coding. All changes will be reflected immediately on the public website.
+          </p>
+          
+          <!-- Organization Info Section -->
+          <div class="section-divider mb-4">
+            <h3 class="border-bottom pb-2 mb-3">Organization Information</h3>
+          </div>
+          
+          <div class="mb-3">
+            <label for="site_name" class="form-label">Organization Name *</label>
+            <input class="form-control" type="text" id="site_name" name="site_name" value="<%= settings.find(s => s.setting_key === 'site_name')?.setting_value || '' %>" required>
+            <small class="text-muted">The main name of your organization</small>
+          </div>
+          
+          <div class="mb-3">
+            <label for="site_tagline" class="form-label">Organization Tagline</label>
+            <input class="form-control" type="text" id="site_tagline" name="site_tagline" value="<%= settings.find(s => s.setting_key === 'site_tagline')?.setting_value || '' %>">
+            <small class="text-muted">Short phrase that represents your organization (e.g., "Seva | Shiksha | Sahyog")</small>
+          </div>
+          
+          <div class="mb-3">
+            <label for="site_description" class="form-label">Site Description</label>
+            <textarea class="form-control" id="site_description" name="site_description" rows="3"><%= settings.find(s => s.setting_key === 'site_description')?.setting_value || '' %></textarea>
+            <small class="text-muted">Meta description for search engines and social media</small>
+          </div>
+          
+          <!-- About Section -->
+          <div class="section-divider mb-4 mt-4">
+            <h3 class="border-bottom pb-2 mb-3">About Your Organization</h3>
+          </div>
+          
+          <div class="mb-3">
+            <label for="mission_statement" class="form-label">Mission Statement</label>
+            <textarea class="form-control" id="mission_statement" name="mission_statement" rows="3"><%= settings.find(s => s.setting_key === 'mission_statement')?.setting_value || '' %></textarea>
+            <small class="text-muted">What is your organization's core mission?</small>
+          </div>
+          
+          <div class="mb-3">
+            <label for="vision_statement" class="form-label">Vision Statement</label>
+            <textarea class="form-control" id="vision_statement" name="vision_statement" rows="3"><%= settings.find(s => s.setting_key === 'vision_statement')?.setting_value || '' %></textarea>
+            <small class="text-muted">Your long-term vision for the future</small>
+          </div>
+          
+          <div class="mb-3">
+            <label for="approach_statement" class="form-label">Approach/Strategy</label>
+            <textarea class="form-control" id="approach_statement" name="approach_statement" rows="3"><%= settings.find(s => s.setting_key === 'approach_statement')?.setting_value || '' %></textarea>
+            <small class="text-muted">How does your organization work to achieve its mission?</small>
+          </div>
+          
+          <!-- Hero Section -->
+          <div class="section-divider mb-4 mt-4">
+            <h3 class="border-bottom pb-2 mb-3">Homepage Hero Section</h3>
+          </div>
+          
+          <div class="mb-3">
+            <label for="hero_title" class="form-label">Hero Title</label>
+            <input class="form-control" type="text" id="hero_title" name="hero_title" value="<%= settings.find(s => s.setting_key === 'hero_title')?.setting_value || '' %>">
+            <small class="text-muted">Main heading on the homepage hero section</small>
+          </div>
+          
+          <div class="mb-3">
+            <label for="hero_subtitle" class="form-label">Hero Subtitle</label>
+            <textarea class="form-control" id="hero_subtitle" name="hero_subtitle" rows="2"><%= settings.find(s => s.setting_key === 'hero_subtitle')?.setting_value || '' %></textarea>
+            <small class="text-muted">Supporting text below the hero title</small>
+          </div>
+          
+          <!-- Contact Information -->
+          <div class="section-divider mb-4 mt-4">
+            <h3 class="border-bottom pb-2 mb-3">Contact Information</h3>
+          </div>
+          
+          <div class="mb-3">
+            <label for="contact_email" class="form-label">Email Address</label>
+            <input class="form-control" type="email" id="contact_email" name="contact_email" value="<%= settings.find(s => s.setting_key === 'contact_email')?.setting_value || '' %>">
+            <small class="text-muted">Primary contact email</small>
+          </div>
+          
+          <div class="mb-3">
+            <label for="contact_phone" class="form-label">Phone Number</label>
+            <input class="form-control" type="text" id="contact_phone" name="contact_phone" value="<%= settings.find(s => s.setting_key === 'contact_phone')?.setting_value || '' %>">
+            <small class="text-muted">Primary contact phone number</small>
+          </div>
+          
+          <div class="mb-3">
+            <label for="office_address" class="form-label">Office Address</label>
+            <textarea class="form-control" id="office_address" name="office_address" rows="2"><%= settings.find(s => s.setting_key === 'office_address')?.setting_value || '' %></textarea>
+            <small class="text-muted">Physical office location</small>
+          </div>
+          
+          <!-- Social Media Links -->
+          <div class="section-divider mb-4 mt-4">
+            <h3 class="border-bottom pb-2 mb-3">Social Media Links</h3>
+          </div>
+          
+          <div class="mb-3">
+            <label for="social_facebook" class="form-label">Facebook Profile URL</label>
+            <input class="form-control" type="url" id="social_facebook" name="social_facebook" value="<%= settings.find(s => s.setting_key === 'social_facebook')?.setting_value || '' %>">
+            <small class="text-muted">Full URL to your Facebook page</small>
+          </div>
+          
+          <div class="mb-3">
+            <label for="social_twitter" class="form-label">Twitter/X Profile URL</label>
+            <input class="form-control" type="url" id="social_twitter" name="social_twitter" value="<%= settings.find(s => s.setting_key === 'social_twitter')?.setting_value || '' %>">
+            <small class="text-muted">Full URL to your Twitter/X account</small>
+          </div>
+          
+          <div class="mb-3">
+            <label for="social_instagram" class="form-label">Instagram Profile URL</label>
+            <input class="form-control" type="url" id="social_instagram" name="social_instagram" value="<%= settings.find(s => s.setting_key === 'social_instagram')?.setting_value || '' %>">
+            <small class="text-muted">Full URL to your Instagram profile</small>
+          </div>
+          
+          <div class="mb-3">
+            <label for="social_youtube" class="form-label">YouTube Channel URL</label>
+            <input class="form-control" type="url" id="social_youtube" name="social_youtube" value="<%= settings.find(s => s.setting_key === 'social_youtube')?.setting_value || '' %>">
+            <small class="text-muted">Full URL to your YouTube channel</small>
+          </div>
+          
+          <div class="mb-3">
+            <label for="social_linkedin" class="form-label">LinkedIn Profile URL</label>
+            <input class="form-control" type="url" id="social_linkedin" name="social_linkedin" value="<%= settings.find(s => s.setting_key === 'social_linkedin')?.setting_value || '' %>">
+            <small class="text-muted">Full URL to your LinkedIn company page</small>
+          </div>
+          
+          <!-- Impact Numbers -->
+          <div class="section-divider mb-4 mt-4">
+            <h3 class="border-bottom pb-2 mb-3">Impact Statistics</h3>
+          </div>
+          
+          <div class="mb-3">
+            <label for="volunteers_impact" class="form-label">Active Volunteers Count</label>
+            <input class="form-control" type="number" id="volunteers_impact" name="volunteers_impact" value="<%= settings.find(s => s.setting_key === 'volunteers_impact')?.setting_value || '0' %>">
+            <small class="text-muted">Number to display as active volunteers</small>
+          </div>
+          
+          <div class="mb-3">
+            <label for="projects_completed" class="form-label">Projects Completed</label>
+            <input class="form-control" type="number" id="projects_completed" name="projects_completed" value="<%= settings.find(s => s.setting_key === 'projects_completed')?.setting_value || '0' %>">
+            <small class="text-muted">Number of projects completed</small>
+          </div>
+          
+          <!-- Footer -->
+          <div class="section-divider mb-4 mt-4">
+            <h3 class="border-bottom pb-2 mb-3">Footer</h3>
+          </div>
+          
+          <div class="mb-4">
+            <label for="footer_text" class="form-label">Footer Copyright Text</label>
+            <input class="form-control" type="text" id="footer_text" name="footer_text" value="<%= settings.find(s => s.setting_key === 'footer_text')?.setting_value || '' %>">
+            <small class="text-muted">Copyright information displayed in the footer</small>
+          </div>
+          
+        </div>
+        <div class="card-footer d-flex gap-2">
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-circle me-2"></i>Save Settings
+          </button>
+          <a href="/admin/dashboard" class="btn btn-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <style>
+    .section-divider {
+      margin-top: 2rem;
+    }
+    .section-divider h3 {
+      font-size: 1.25rem;
+      color: #333;
+      font-weight: 600;
+    }
+  </style>
+` }) %>
