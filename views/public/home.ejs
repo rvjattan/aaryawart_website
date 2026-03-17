@@ -1,5 +1,6 @@
 <%- include('layout', { title, body: `
-  <section class="hero-section text-white d-flex align-items-center" style="background-image: url('<%= (hero && hero.extra_json && JSON.parse(hero.extra_json).backgroundImage) || '/static/images/hero.jpg' %>');">
+  <% let heroExtra = {}; try { heroExtra = hero && hero.extra_json ? JSON.parse(hero.extra_json) : {}; } catch (e) { heroExtra = {}; } %>
+  <section class="hero-section text-white d-flex align-items-center" style="background-image: url('<%= heroExtra.backgroundImage || '/static/images/hero.jpg' %>');">
     <div class="container py-5">
       <div class="row align-items-center">
         <div class="col-md-7">

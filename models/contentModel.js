@@ -1,35 +1,51 @@
 const pool = require('../config/db');
 
 async function getBlocks(page, section) {
-  const [rows] = await pool.query(
-    `SELECT id, page, section, title, body, extra_json, sort_order
-     FROM content_blocks
-     WHERE page = ? AND section = ?
-     ORDER BY sort_order ASC, id ASC`,
-    [page, section]
-  );
-  return rows;
+  try {
+    const [rows] = await pool.query(
+      `SELECT id, page, section, title, body, extra_json, sort_order
+       FROM content_blocks
+       WHERE page = ? AND section = ?
+       ORDER BY sort_order ASC, id ASC`,
+      [page, section]
+    );
+    return rows;
+  } catch (err) {
+    // Allow app to run even if migrations not applied yet
+    if (err && err.code === 'ER_NO_SUCH_TABLE') return [];
+    throw err;
+  }
 }
 
 async function getBlocksForPage(page) {
-  const [rows] = await pool.query(
-    `SELECT id, page, section, title, body, extra_json, sort_order
-     FROM content_blocks
-     WHERE page = ?
-     ORDER BY section ASC, sort_order ASC, id ASC`,
-    [page]
-  );
-  return rows;
+  try {
+    const [rows] = await pool.query(
+      `SELECT id, page, section, title, body, extra_json, sort_order
+       FROM content_blocks
+       WHERE page = ?
+       ORDER BY section ASC, sort_order ASC, id ASC`,
+      [page]
+    );
+    return rows;
+  } catch (err) {
+    if (err && err.code === 'ER_NO_SUCH_TABLE') return [];
+    throw err;
+  }
 }
 
 async function getBlockById(id) {
-  const [rows] = await pool.query(
-    `SELECT id, page, section, title, body, extra_json, sort_order
-     FROM content_blocks
-     WHERE id = ?`,
-    [id]
-  );
-  return rows[0] || null;
+  try {
+    const [rows] = await pool.query(
+      `SELECT id, page, section, title, body, extra_json, sort_order
+       FROM content_blocks
+       WHERE id = ?`,
+      [id]
+    );
+    return rows[0] || null;
+  } catch (err) {
+    if (err && err.code === 'ER_NO_SUCH_TABLE') return null;
+    throw err;
+  }
 }
 
 async function createBlock({ page, section, title, body, extra_json, sort_order = 0 }) {

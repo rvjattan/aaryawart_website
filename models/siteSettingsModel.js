@@ -1,29 +1,39 @@
 const pool = require('../config/db');
 
 async function getSetting(key, defaultValue = null) {
-  const [rows] = await pool.query(
-    'SELECT settings_value FROM site_settings WHERE settings_key = ?',
-    [key]
-  );
-  if (!rows[0]) return defaultValue;
-  return rows[0].settings_value;
+  try {
+    const [rows] = await pool.query(
+      'SELECT settings_value FROM site_settings WHERE settings_key = ?',
+      [key]
+    );
+    if (!rows[0]) return defaultValue;
+    return rows[0].settings_value;
+  } catch (err) {
+    if (err && err.code === 'ER_NO_SUCH_TABLE') return defaultValue;
+    throw err;
+  }
 }
 
 async function getSettings(keysWithDefaults = {}) {
   const keys = Object.keys(keysWithDefaults);
   if (!keys.length) return {};
 
-  const placeholders = keys.map(() => '?').join(',');
-  const [rows] = await pool.query(
-    `SELECT settings_key, settings_value FROM site_settings WHERE settings_key IN (${placeholders})`,
-    keys
-  );
+  try {
+    const placeholders = keys.map(() => '?').join(',');
+    const [rows] = await pool.query(
+      `SELECT settings_key, settings_value FROM site_settings WHERE settings_key IN (${placeholders})`,
+      keys
+    );
 
-  const map = { ...keysWithDefaults };
-  rows.forEach((row) => {
-    map[row.settings_key] = row.settings_value;
-  });
-  return map;
+    const map = { ...keysWithDefaults };
+    rows.forEach((row) => {
+      map[row.settings_key] = row.settings_value;
+    });
+    return map;
+  } catch (err) {
+    if (err && err.code === 'ER_NO_SUCH_TABLE') return { ...keysWithDefaults };
+    throw err;
+  }
 }
 
 async function setSetting(key, value) {

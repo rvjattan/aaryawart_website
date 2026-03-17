@@ -30,7 +30,19 @@ app.use('/static', express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Security & logging
-app.use(helmet());
+// Configure CSP to allow Bootstrap and Bootstrap Icons from jsdelivr CDN
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "https://cdn.jsdelivr.net"],
+      styleSrc: ["'self'", "https://cdn.jsdelivr.net"],
+      fontSrc: ["'self'", "https://cdn.jsdelivr.net"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'"],
+    },
+  },
+}));
 app.use(morgan('dev'));
 
 // Parsers
@@ -105,15 +117,7 @@ app.use(async (req, res, next) => {
 // Public pages
 app.get('/', async (req, res, next) => {
   try {
-    const [
-      latestBlogs,
-      stats,
-      heroBlocks,
-      missionBlocks,
-      visionBlocks,
-      approachBlocks,
-      testimonialBlocks,
-    ] = await Promise.all([
+    const results = await Promise.allSettled([
       blogModel.getBlogs({ page: 1, limit: 3, status: 'PUBLISHED' }),
       statsModel.getMany([
         'volunteers_registered',
@@ -127,19 +131,32 @@ app.get('/', async (req, res, next) => {
       contentModel.getBlocks('home', 'testimonials'),
     ]);
 
-    const hero = heroBlocks[0] || null;
-    const mission = missionBlocks[0] || null;
-    const vision = visionBlocks[0] || null;
-    const approach = approachBlocks[0] || null;
+    const getValue = (result, fallback) =>
+      result.status === 'fulfilled' ? result.value : fallback;
+
+    const latestBlogs = getValue(results[0], { data: [] });
+    const stats       = getValue(results[1], {});
+    const heroBlocks  = getValue(results[2], []);
+    const missionBlocks = getValue(results[3], []);
+    const visionBlocks  = getValue(results[4], []);
+    const approachBlocks = getValue(results[5], []);
+    const testimonialBlocks = getValue(results[6], []);
+
+    // Log DB errors for debugging without crashing the page
+    results.forEach((r, i) => {
+      if (r.status === 'rejected') {
+        console.error(`Homepage DB query [${i}] failed:`, r.reason && r.reason.message);
+      }
+    });
 
     res.render('public/home', {
       title: 'Home',
-      latestBlogs: latestBlogs.data,
+      latestBlogs: latestBlogs.data || [],
       stats,
-      hero,
-      mission,
-      vision,
-      approach,
+      hero: heroBlocks[0] || null,
+      mission: missionBlocks[0] || null,
+      vision: visionBlocks[0] || null,
+      approach: approachBlocks[0] || null,
       testimonials: testimonialBlocks,
     });
   } catch (err) {
