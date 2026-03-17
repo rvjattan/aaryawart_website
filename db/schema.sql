@@ -90,37 +90,26 @@ CREATE TABLE IF NOT EXISTS donations (
   UNIQUE KEY uk_donations_razorpay_order (razorpay_order_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Site Settings - Key-value store for configurable site details
+-- Site-wide key/value settings (header, footer, page texts, etc.)
 CREATE TABLE IF NOT EXISTS site_settings (
-  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  setting_key VARCHAR(100) NOT NULL UNIQUE,
-  setting_value LONGTEXT NOT NULL,
-  setting_type ENUM('text', 'textarea', 'number', 'email', 'url', 'json') NOT NULL DEFAULT 'text',
-  description VARCHAR(255),
+  settings_key VARCHAR(150) NOT NULL PRIMARY KEY,
+  settings_value TEXT NOT NULL,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Insert default site settings
-INSERT IGNORE INTO site_settings (setting_key, setting_value, setting_type, description) VALUES
-  ('site_name', 'Aaryawart Seva Nyaas', 'text', 'Organization name'),
-  ('site_tagline', 'Seva | Shiksha | Sahyog', 'text', 'Organization tagline'),
-  ('site_description', 'A nationwide volunteer movement working in education, healthcare, rural development, women empowerment, disaster relief, and cultural preservation.', 'textarea', 'Site meta description'),
-  ('mission_statement', 'To build a harmonious, self-reliant, and compassionate society through organized, selfless service rooted in timeless values.', 'textarea', 'Organization mission'),
-  ('vision_statement', 'A nation where every individual is empowered, every village is vibrant, and cultural heritage guides modern progress.', 'textarea', 'Organization vision'),
-  ('approach_statement', 'Grassroots initiatives led by trained volunteers, in partnership with communities, institutions, and well-wishers worldwide.', 'textarea', 'Organization approach'),
-  ('hero_title', 'Serving Society, Preserving Culture, Empowering Communities', 'text', 'Hero section title'),
-  ('hero_subtitle', 'A nationwide volunteer movement working in education, healthcare, rural development, women empowerment, disaster relief, and cultural preservation.', 'textarea', 'Hero section subtitle'),
-  ('contact_email', 'contact@aaryawart.org', 'email', 'Main contact email'),
-  ('contact_phone', '+91-XXX-XXXX-XXXX', 'text', 'Main contact phone'),
-  ('office_address', 'Your Organization Address', 'textarea', 'Physical office address'),
-  ('social_facebook', 'https://facebook.com/aaryawart', 'url', 'Facebook profile URL'),
-  ('social_twitter', 'https://twitter.com/aaryawart', 'url', 'Twitter profile URL'),
-  ('social_instagram', 'https://instagram.com/aaryawart', 'url', 'Instagram profile URL'),
-  ('social_youtube', 'https://youtube.com/@aaryawart', 'url', 'YouTube channel URL'),
-  ('social_linkedin', 'https://linkedin.com/company/aaryawart', 'url', 'LinkedIn profile URL'),
-  ('footer_text', '© 2026 Aaryawart Seva Nyaas. All rights reserved.', 'text', 'Footer copyright text'),
-  ('volunteers_impact', '2719', 'number', 'Active volunteers count'),
-  ('projects_completed', '3', 'number', 'Projects completed count');
+-- Generic content blocks for repeatable items (timeline, testimonials, activities, branches, etc.)
+CREATE TABLE IF NOT EXISTS content_blocks (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  page VARCHAR(50) NOT NULL,
+  section VARCHAR(50) NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  body TEXT,
+  extra_json JSON NULL,
+  sort_order INT NOT NULL DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_content_page_section (page, section, sort_order)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Create the first admin by running: node scripts/create_admin.js
 -- Default login: username 'superadmin', password 'admin123' (change in production)
