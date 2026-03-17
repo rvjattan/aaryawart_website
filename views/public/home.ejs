@@ -1,16 +1,101 @@
-<%- include('_header', { title }) %>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title><%= title %> - <%= (settings && settings.site_name) || 'Aaryawart Seva Nyaas' %></title>
+    <meta name="description" content="Official website of <%= (settings && settings.site_name) || 'Aaryawart Seva Nyaas' %>, a social and charity organization focusing on education, healthcare, rural development, women empowerment, youth, culture, and environment." />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+    />
+    <link rel="stylesheet" href="/static/css/style.css" />
+  </head>
+  <body>
+    <header class="border-bottom bg-light">
+      <div class="container py-2 py-md-2 d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div class="d-flex align-items-center gap-2 gap-md-3 flex-shrink-0 min-w-0">
+          <img src="<%= (settings && settings.header_logo_url) || '/static/images/logo.png' %>" alt="Logo" class="logo-img flex-shrink-0" />
+          <div class="min-w-0">
+            <span class="fw-bold text-primary d-block text-truncate" style="font-size: clamp(0.9rem, 3vw, 1rem);"><%= (settings && settings.site_name) || 'Aaryawart Seva Nyaas' %></span>
+            <small class="text-muted d-none d-sm-inline"><%= (settings && settings.site_tagline) || 'Seva | Shiksha | Sahyog' %></small>
+          </div>
+        </div>
+        <div class="d-none d-md-flex gap-2 flex-shrink-0">
+          <a href="/get-involved" class="btn btn-outline-primary btn-sm">Join Us</a>
+          <a href="/get-involved#donate" class="btn btn-primary btn-sm">Donate</a>
+        </div>
+      </div>
+      <div class="container d-md-none mt-2 pb-2">
+        <div class="d-flex justify-content-center gap-2">
+          <a href="/get-involved" class="btn btn-outline-primary btn-sm flex-grow-1 flex-md-grow-0" style="min-width: 0;">Join</a>
+          <a href="/get-involved#donate" class="btn btn-primary btn-sm flex-grow-1 flex-md-grow-0" style="min-width: 0;">Donate</a>
+        </div>
+      </div>
+      <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+          <a class="navbar-brand" href="/">Home</a>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#mainNav"
+            aria-controls="mainNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item"><a class="nav-link" href="/about">About Us</a></li>
+              <li class="nav-item"><a class="nav-link" href="/activities">Activities &amp; Programs</a></li>
+              <li class="nav-item"><a class="nav-link" href="/media">Media &amp; Publications</a></li>
+              <li class="nav-item"><a class="nav-link" href="/get-involved">Get Involved</a></li>
+              <li class="nav-item"><a class="nav-link" href="/contact">Contact</a></li>
+            </ul>
+            <div class="d-flex gap-3 py-2 py-lg-0 justify-content-center justify-content-lg-end flex-wrap">
+              <% let socialLinks = []; try { socialLinks = settings && settings.social_links_json ? JSON.parse(settings.social_links_json) : []; } catch (e) { socialLinks = []; } %>
+              <% if (!socialLinks.length) { %>
+                <a href="https://www.facebook.com/people/Aaryawart-Seva-Nyaas/61585981201970/" class="text-white text-decoration-none" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+                <a href="https://x.com/aaryawartastro" class="text-white text-decoration-none" aria-label="Twitter"><i class="bi bi-twitter-x"></i></a>
+                <a href="https://www.instagram.com/aaryawart_seva_nyaas/" class="text-white text-decoration-none" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+                <a href="https://www.youtube.com/@aaryawartastroworld" class="text-white text-decoration-none" aria-label="YouTube"><i class="bi bi-youtube"></i></a>
+                <a href="https://linkedin.com" class="text-white text-decoration-none" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+              <% } else { %>
+                <% socialLinks.forEach(function(link) { %>
+                  <a href="<%= link.url %>" class="text-white text-decoration-none" aria-label="<%= link.id %>"><i class="bi <%= link.icon %>"></i></a>
+                <% }); %>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      </nav>
+      <div class="news-ticker bg-warning text-dark">
+        <div class="container">
+          <span class="fw-bold me-2">Latest:</span>
+          <marquee behavior="scroll" direction="left">
+            <%= (settings && settings.news_ticker_text) || 'Upcoming health camp in rural districts • National youth leadership workshop • Flood relief volunteer deployment • New education centers inaugurated' %>
+          </marquee>
+        </div>
+      </div>
+    </header>
 
-<% let heroExtra = {}; try { heroExtra = hero && hero.extra_json ? JSON.parse(hero.extra_json) : {}; } catch (e) { heroExtra = {}; } %>
+    <main>
+
+<% var heroExtra = {}; try { heroExtra = hero && hero.extra_json ? JSON.parse(hero.extra_json) : {}; } catch (e) { heroExtra = {}; } %>
 <section class="hero-section text-white d-flex align-items-center" style="background-image: url('<%= heroExtra.backgroundImage || '/static/images/hero.jpg' %>');">
   <div class="container py-5">
     <div class="row align-items-center">
       <div class="col-md-7">
         <h1 class="display-5 fw-bold mb-3"><%= (hero && hero.title) || 'Serving Society, Preserving Culture, Empowering Communities' %></h1>
-        <p class="lead mb-4">
-          <%= (hero && hero.body) || 'A nationwide volunteer movement working in education, healthcare, rural development, women empowerment, disaster relief, and cultural preservation.' %>
-        </p>
+        <p class="lead mb-4"><%= (hero && hero.body) || 'A nationwide volunteer movement working in education, healthcare, rural development, women empowerment, disaster relief, and cultural preservation.' %></p>
         <div class="d-flex flex-wrap gap-2">
-          <% let heroButtons = []; try { heroButtons = hero && hero.extra_json ? (JSON.parse(hero.extra_json).buttons || []) : []; } catch (e) { heroButtons = []; } %>
+          <% var heroButtons = []; try { heroButtons = hero && hero.extra_json ? (JSON.parse(hero.extra_json).buttons || []) : []; } catch (e) { heroButtons = []; } %>
           <% if (!heroButtons.length) { %>
             <a href="/get-involved" class="btn btn-light btn-lg">Join Us</a>
             <a href="/get-involved#donate" class="btn btn-outline-light btn-lg">Donate</a>
@@ -97,7 +182,7 @@
         <h2 class="mb-3">Testimonials</h2>
         <% if (testimonials && testimonials.length) { %>
           <% testimonials.forEach(function(t) { %>
-            <% let tExtra = {}; try { tExtra = t.extra_json ? JSON.parse(t.extra_json) : {}; } catch (e) { tExtra = {}; } %>
+            <% var tExtra = {}; try { tExtra = t.extra_json ? JSON.parse(t.extra_json) : {}; } catch (e) { tExtra = {}; } %>
             <div class="testimonial mb-3">
               <p><%= t.body || '' %></p>
               <% if (t.title || tExtra.attribution) { %>
@@ -107,15 +192,15 @@
           <% }); %>
         <% } else { %>
           <div class="testimonial mb-3">
-            <p>"Volunteering here has given my life a new purpose and connected me deeply with local communities."</p>
+            <p>"Volunteering here has given my life a new purpose."</p>
             <small class="text-muted">-- Ananya, Youth Volunteer</small>
           </div>
           <div class="testimonial mb-3">
-            <p>"Their rural development programs have transformed our village schools and health centers."</p>
+            <p>"Their programs have transformed our village schools."</p>
             <small class="text-muted">-- Village Sarpanch, Maharashtra</small>
           </div>
           <div class="testimonial">
-            <p>"In times of disaster, their teams are among the first to reach and the last to leave."</p>
+            <p>"Their teams are among the first to reach in times of disaster."</p>
             <small class="text-muted">-- District Collector, Assam</small>
           </div>
         <% } %>
@@ -123,7 +208,51 @@
     </div>
   </div>
 </section>
-
 <script src="/static/js/counters.js"></script>
 
-<%- include('_footer') %>
+    </main>
+
+    <footer class="bg-dark text-white mt-5 pt-4 pb-3">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <h5>About</h5>
+            <p class="small">
+              <%= (settings && settings.footer_about) || 'A nationwide social and cultural organization dedicated to selfless service, character building, and national integration through thousands of volunteers and grassroots projects.' %>
+            </p>
+          </div>
+          <div class="col-md-4 mb-3">
+            <h5>Quick Links</h5>
+            <ul class="list-unstyled small">
+              <% let quickLinks = []; try { quickLinks = settings && settings.footer_quick_links_json ? JSON.parse(settings.footer_quick_links_json) : []; } catch (e) { quickLinks = []; } %>
+              <% if (!quickLinks.length) { %>
+                <li><a href="/about" class="text-white text-decoration-none">About Us</a></li>
+                <li><a href="/activities" class="text-white text-decoration-none">Activities</a></li>
+                <li><a href="/media" class="text-white text-decoration-none">Media</a></li>
+                <li><a href="/get-involved" class="text-white text-decoration-none">Volunteer / Donate</a></li>
+                <li><a href="/contact" class="text-white text-decoration-none">Contact</a></li>
+              <% } else { %>
+                <% quickLinks.forEach(function(link) { %>
+                  <li><a href="<%= link.url %>" class="text-white text-decoration-none"><%= link.label %></a></li>
+                <% }); %>
+              <% } %>
+            </ul>
+          </div>
+          <div class="col-md-4 mb-3">
+            <h5>Contact</h5>
+            <% const footerContact = (settings && settings.footer_contact) || '113, Shivalik Nagar, BHEL, Haridwar, UK, India (249403)\nEmail: aaryawartsevanyaas@gmail.com\nPhone: +91-9253999082, 9253999083'; %>
+            <% footerContact.split(/\r?\n/).forEach(function(line) { %>
+              <p class="small mb-1"><%= line %></p>
+            <% }); %>
+          </div>
+        </div>
+        <div class="text-center small mt-3">
+          &copy; <%= new Date().getFullYear() %> <%= (settings && settings.site_name) || 'Aaryawart Seva Nyaas' %>. All rights reserved.
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/main.js"></script>
+  </body>
+</html>
