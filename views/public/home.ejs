@@ -1,134 +1,129 @@
-<%- include('layout', { title, body: `
-  <% let heroExtra = {}; try { heroExtra = hero && hero.extra_json ? JSON.parse(hero.extra_json) : {}; } catch (e) { heroExtra = {}; } %>
-  <section class="hero-section text-white d-flex align-items-center" style="background-image: url('<%= heroExtra.backgroundImage || '/static/images/hero.jpg' %>');">
-    <div class="container py-5">
-      <div class="row align-items-center">
-        <div class="col-md-7">
-          <h1 class="display-5 fw-bold mb-3"><%= (hero && hero.title) || 'Serving Society, Preserving Culture, Empowering Communities' %></h1>
-          <p class="lead mb-4">
-            <%= (hero && hero.body) || 'A nationwide volunteer movement working in education, healthcare, rural development, women empowerment, disaster relief, and cultural preservation.' %>
-          </p>
-          <div class="d-flex flex-wrap gap-2">
-            <% let heroButtons = []; try { heroButtons = hero && hero.extra_json ? (JSON.parse(hero.extra_json).buttons || []) : []; } catch (e) { heroButtons = []; } %>
-            <% if (!heroButtons.length) { %>
-              <a href="/get-involved" class="btn btn-light btn-lg">Join Us</a>
-              <a href="/get-involved#donate" class="btn btn-outline-light btn-lg">Donate</a>
-              <a href="/about" class="btn btn-outline-light btn-lg">Learn More</a>
-            <% } else { %>
-              <% heroButtons.forEach(function(btn) { %>
-                <a href="<%= btn.url %>" class="btn btn-<%= btn.variant || 'light' %> btn-lg"><%= btn.label %></a>
-              <% }); %>
-            <% } %>
-          </div>
+<%- include('_header', { title }) %>
+
+<% let heroExtra = {}; try { heroExtra = hero && hero.extra_json ? JSON.parse(hero.extra_json) : {}; } catch (e) { heroExtra = {}; } %>
+<section class="hero-section text-white d-flex align-items-center" style="background-image: url('<%= heroExtra.backgroundImage || '/static/images/hero.jpg' %>');">
+  <div class="container py-5">
+    <div class="row align-items-center">
+      <div class="col-md-7">
+        <h1 class="display-5 fw-bold mb-3"><%= (hero && hero.title) || 'Serving Society, Preserving Culture, Empowering Communities' %></h1>
+        <p class="lead mb-4">
+          <%= (hero && hero.body) || 'A nationwide volunteer movement working in education, healthcare, rural development, women empowerment, disaster relief, and cultural preservation.' %>
+        </p>
+        <div class="d-flex flex-wrap gap-2">
+          <% let heroButtons = []; try { heroButtons = hero && hero.extra_json ? (JSON.parse(hero.extra_json).buttons || []) : []; } catch (e) { heroButtons = []; } %>
+          <% if (!heroButtons.length) { %>
+            <a href="/get-involved" class="btn btn-light btn-lg">Join Us</a>
+            <a href="/get-involved#donate" class="btn btn-outline-light btn-lg">Donate</a>
+            <a href="/about" class="btn btn-outline-light btn-lg">Learn More</a>
+          <% } else { %>
+            <% heroButtons.forEach(function(btn) { %>
+              <a href="<%= btn.url %>" class="btn btn-<%= btn.variant || 'light' %> btn-lg"><%= btn.label %></a>
+            <% }); %>
+          <% } %>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <section class="py-5">
-    <div class="container">
-      <div class="row text-center">
-        <div class="col-md-4 mb-3">
-          <h3><%= (mission && mission.title) || 'Our Mission' %></h3>
-          <p>
-            <%= (mission && mission.body) || 'To build a harmonious, self-reliant, and compassionate society through organized, selfless service rooted in timeless values.' %>
-          </p>
-        </div>
-        <div class="col-md-4 mb-3">
-          <h3><%= (vision && vision.title) || 'Our Vision' %></h3>
-          <p>
-            <%= (vision && vision.body) || 'A nation where every individual is empowered, every village is vibrant, and cultural heritage guides modern progress.' %>
-          </p>
-        </div>
-        <div class="col-md-4 mb-3">
-          <h3><%= (approach && approach.title) || 'Our Approach' %></h3>
-          <p>
-            <%= (approach && approach.body) || 'Grassroots initiatives led by trained volunteers, in partnership with communities, institutions, and well-wishers worldwide.' %>
-          </p>
-        </div>
+<section class="py-5">
+  <div class="container">
+    <div class="row text-center">
+      <div class="col-md-4 mb-3">
+        <h3><%= (mission && mission.title) || 'Our Mission' %></h3>
+        <p><%= (mission && mission.body) || 'To build a harmonious, self-reliant, and compassionate society through organized, selfless service rooted in timeless values.' %></p>
+      </div>
+      <div class="col-md-4 mb-3">
+        <h3><%= (vision && vision.title) || 'Our Vision' %></h3>
+        <p><%= (vision && vision.body) || 'A nation where every individual is empowered, every village is vibrant, and cultural heritage guides modern progress.' %></p>
+      </div>
+      <div class="col-md-4 mb-3">
+        <h3><%= (approach && approach.title) || 'Our Approach' %></h3>
+        <p><%= (approach && approach.body) || 'Grassroots initiatives led by trained volunteers, in partnership with communities, institutions, and well-wishers worldwide.' %></p>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <section class="py-5 bg-light">
-    <div class="container">
-      <h2 class="text-center mb-4">Our Impact</h2>
-      <div class="row text-center">
-        <div class="col-md-4 mb-3">
+<section class="py-5 bg-light">
+  <div class="container">
+    <h2 class="text-center mb-4">Our Impact</h2>
+    <div class="row text-center">
+      <div class="col-md-4 mb-3">
         <div class="impact-card">
-          <div class="impact-number">${stats.volunteers_registered || 2719}</div>
+          <div class="impact-number"><%= (stats && stats.volunteers_registered) || 2719 %></div>
           <div class="impact-label">Active Volunteers</div>
         </div>
       </div>
       <div class="col-md-4 mb-3">
         <div class="impact-card">
-          <div class="impact-number">${stats.projects_completed || 3}</div>
+          <div class="impact-number"><%= (stats && stats.projects_completed) || 3 %></div>
           <div class="impact-label">Projects Completed</div>
         </div>
       </div>
       <div class="col-md-4 mb-3">
         <div class="impact-card">
-          <div class="impact-number">${stats.lives_impacted || 50000}</div>
+          <div class="impact-number"><%= (stats && stats.lives_impacted) || 50000 %></div>
           <div class="impact-label">Lives Impacted</div>
         </div>
       </div>
-      </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <section class="py-5">
-    <div class="container">
-      <div class="row">
-        <div class="col-md-8">
-          <h2 class="mb-3">Latest Activities</h2>
-          ${latestBlogs.length === 0
-            ? '<p>No recent activities yet.</p>'
-            : '<div class="list-group">' +
-              latestBlogs.map(b => `
-                <a href="/media#blog-${b.id}" class="list-group-item list-group-item-action">
-                  <div class="d-flex w-100 justify-content-between">
-                    <h5 class="mb-1">${b.title}</h5>
-                    <small>${b.publish_date}</small>
-                  </div>
-                  <p class="mb-1">${(b.content || '').replace(/<[^>]+>/g, '').substring(0, 150)}...</p>
-                  <small>${b.category || ''} · ${b.author}</small>
-                </a>
-              `).join('') +
-              '</div>'
-          }
-        </div>
-        <div class="col-md-4">
-          <h2 class="mb-3">Testimonials</h2>
-          <% if (testimonials && testimonials.length) { %>
-            <% testimonials.forEach(function(t) { %>
-              <% let extra = {}; try { extra = t.extra_json ? JSON.parse(t.extra_json) : {}; } catch (e) { extra = {}; } %>
-              <div class="testimonial mb-3">
-                <p><%= t.body || '' %></p>
-                <% if (t.title || extra.attribution) { %>
-                  <small class="text-muted">– <%= extra.attribution || t.title %></small>
-                <% } %>
-              </div>
+<section class="py-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-8">
+        <h2 class="mb-3">Latest Activities</h2>
+        <% if (!latestBlogs || latestBlogs.length === 0) { %>
+          <p>No recent activities yet.</p>
+        <% } else { %>
+          <div class="list-group">
+            <% latestBlogs.forEach(function(b) { %>
+              <a href="/media#blog-<%= b.id %>" class="list-group-item list-group-item-action">
+                <div class="d-flex w-100 justify-content-between">
+                  <h5 class="mb-1"><%= b.title %></h5>
+                  <small><%= b.publish_date %></small>
+                </div>
+                <p class="mb-1"><%= (b.content || '').replace(/<[^>]+>/g, '').substring(0, 150) %>...</p>
+                <small><%= b.category || '' %> - <%= b.author %></small>
+              </a>
             <% }); %>
-          <% } else { %>
+          </div>
+        <% } %>
+      </div>
+      <div class="col-md-4">
+        <h2 class="mb-3">Testimonials</h2>
+        <% if (testimonials && testimonials.length) { %>
+          <% testimonials.forEach(function(t) { %>
+            <% let tExtra = {}; try { tExtra = t.extra_json ? JSON.parse(t.extra_json) : {}; } catch (e) { tExtra = {}; } %>
             <div class="testimonial mb-3">
-              <p>"Volunteering here has given my life a new purpose and connected me deeply with local communities."</p>
-              <small class="text-muted">– Ananya, Youth Volunteer</small>
+              <p><%= t.body || '' %></p>
+              <% if (t.title || tExtra.attribution) { %>
+                <small class="text-muted">-- <%= tExtra.attribution || t.title %></small>
+              <% } %>
             </div>
-            <div class="testimonial mb-3">
-              <p>"Their rural development programs have transformed our village schools and health centers."</p>
-              <small class="text-muted">– Village Sarpanch, Maharashtra</small>
-            </div>
-            <div class="testimonial">
-              <p>"In times of disaster, their teams are among the first to reach and the last to leave."</p>
-              <small class="text-muted">– District Collector, Assam</small>
-            </div>
-          <% } %>
-        </div>
+          <% }); %>
+        <% } else { %>
+          <div class="testimonial mb-3">
+            <p>"Volunteering here has given my life a new purpose and connected me deeply with local communities."</p>
+            <small class="text-muted">-- Ananya, Youth Volunteer</small>
+          </div>
+          <div class="testimonial mb-3">
+            <p>"Their rural development programs have transformed our village schools and health centers."</p>
+            <small class="text-muted">-- Village Sarpanch, Maharashtra</small>
+          </div>
+          <div class="testimonial">
+            <p>"In times of disaster, their teams are among the first to reach and the last to leave."</p>
+            <small class="text-muted">-- District Collector, Assam</small>
+          </div>
+        <% } %>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <script src="/static/js/counters.js"></script>
+<script src="/static/js/counters.js"></script>
 
-` }) %>
-
+<%- include('_footer') %>

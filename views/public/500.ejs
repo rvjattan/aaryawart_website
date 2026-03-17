@@ -1,4 +1,5 @@
-<%- include('layout', { title, body: `
+<%- include('_header', { title }) %>
+
   <section class="py-5 text-center">
     <div class="container">
       <h1 class="display-4">Server Error</h1>
@@ -6,5 +7,5 @@
       <a href="/" class="btn btn-primary mt-3">Back to Home</a>
     </div>
   </section>
-` }) %>
 
+<%- include('_footer') %>
