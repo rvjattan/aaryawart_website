@@ -547,20 +547,33 @@ router.post('/content/home/testimonials/:id/delete', roleRequired(['SUPER_ADMIN'
 // Testimonials management
 router.get('/testimonials', roleRequired(['SUPER_ADMIN', 'EDITOR', 'MODERATOR']), async (req, res, next) => {
   try {
-    const { page = 1, status } = req.query;
+    const page = parseInt(req.query.page) || 1;
+    const status = req.query.status || null;
     const isApproved = status === 'approved' ? true : status === 'pending' ? false : null;
-    const result = await testimonialModel.getTestimonials({ 
-      page, 
-      limit: 20, 
-      isApproved,
-      sortBy: 'submitted_at',
-      order: 'DESC'
-    });
+    
+    let result = { data: [], total: 0, page: 1, limit: 20, pages: 0 };
+    try {
+      result = await testimonialModel.getTestimonials({ 
+        page, 
+        limit: 20, 
+        isApproved,
+        sortBy: 'submitted_at',
+        order: 'DESC'
+      });
+    } catch (dbErr) {
+      console.error('Error fetching testimonials:', dbErr.message);
+      // Return empty result instead of crashing
+    }
+    
     res.render('admin/testimonials/index', {
       title: 'Testimonials',
       user: req.user,
-      ...result,
-      filters: { status },
+      data: result.data || [],
+      total: result.total || 0,
+      page: result.page || 1,
+      limit: result.limit || 20,
+      pages: result.pages || 0,
+      filters: { status: status || null },
     });
   } catch (err) {
     next(err);
