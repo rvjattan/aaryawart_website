@@ -111,6 +111,19 @@ CREATE TABLE IF NOT EXISTS content_blocks (
   INDEX idx_content_page_section (page, section, sort_order)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- Testimonials submitted by users
+CREATE TABLE IF NOT EXISTS testimonials (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(120) NOT NULL,
+  email VARCHAR(120) NOT NULL,
+  message TEXT NOT NULL,
+  is_approved BOOLEAN NOT NULL DEFAULT FALSE,
+  submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_testimonials_is_approved (is_approved),
+  INDEX idx_testimonials_submitted_at (submitted_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- Create the first admin by running: node scripts/create_admin.js
 -- Default login: username 'superadmin', password 'admin123' (change in production)
 

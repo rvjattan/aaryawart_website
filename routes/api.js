@@ -5,6 +5,7 @@ const { createVolunteer } = require('../models/volunteerModel');
 const { getBlogs, getBlogById } = require('../models/blogModel');
 const statsModel = require('../models/statsModel');
 const donationModel = require('../models/donationModel');
+const testimonialModel = require('../models/testimonialModel');
 const nodemailer = require('nodemailer');
 
 const Razorpay = require('razorpay');
@@ -185,6 +186,38 @@ router.post('/donate/verify', async (req, res, next) => {
     });
 
     res.json({ success: true, message: 'Thank you for your donation!' });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Public API: submit testimonial
+router.post('/testimonials', async (req, res, next) => {
+  try {
+    const { name, email, message } = req.body;
+    
+    // Validation
+    if (!name || !email || !message) {
+      return res.status(400).json({ success: false, message: 'Name, email, and message are required.' });
+    }
+    
+    // Basic email validation
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ success: false, message: 'Invalid email address.' });
+    }
+    
+    const testimonial = await testimonialModel.createTestimonial(name, email, message);
+    res.status(201).json({ success: true, data: testimonial, message: 'Thank you for your testimonial! It will be displayed after approval.' });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Public API: get approved testimonials
+router.get('/testimonials', async (req, res, next) => {
+  try {
+    const testimonials = await testimonialModel.getApprovedTestimonials();
+    res.json({ success: true, data: testimonials });
   } catch (err) {
     next(err);
   }

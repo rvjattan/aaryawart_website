@@ -1,51 +1,99 @@
 <%- include('layout', { title, user, settings, body: `
   <div class="row">
-    <div class="col-md-8">
-      <div class="card mb-4">
-        <div class="card-header">Site Identity</div>
-        <div class="card-body">
-          ${message ? `<div class="alert alert-success">${message}</div>` : ''}
-          ${error ? `<div class="alert alert-danger">${error}</div>` : ''}
-          <form method="post" action="/admin/settings">
+    <div class="col-md-10">
+      <h2 class="mb-4">Site Settings</h2>
+      ${message ? `<div class="alert alert-success">${message}</div>` : ''}
+      ${error ? `<div class="alert alert-danger">${error}</div>` : ''}
+
+      <form method="post" action="/admin/settings">
+        <!-- Site Identity Section -->
+        <div class="card mb-4">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-building me-2"></i> Site Identity</h5>
+          </div>
+          <div class="card-body">
             <div class="mb-3">
               <label class="form-label">Site Name</label>
-              <input type="text" name="site_name" class="form-control" value="${settings.site_name || ''}" />
+              <input type="text" name="site_name" class="form-control" value="${settings.site_name || ''}" placeholder="e.g., Aaryawart Seva Nyaas" />
             </div>
             <div class="mb-3">
               <label class="form-label">Tagline</label>
-              <input type="text" name="site_tagline" class="form-control" value="${settings.site_tagline || ''}" />
+              <input type="text" name="site_tagline" class="form-control" value="${settings.site_tagline || ''}" placeholder="e.g., Seva | Shiksha | Sahyog" />
             </div>
             <div class="mb-3">
               <label class="form-label">Header Logo URL</label>
-              <input type="text" name="header_logo_url" class="form-control" value="${settings.header_logo_url || ''}" />
-              <div class="form-text">Use /static/images/... for uploaded logos.</div>
+              <input type="text" name="header_logo_url" class="form-control" value="${settings.header_logo_url || ''}" placeholder="/static/images/logo.png" />
+              <div class="form-text">Enter the path to your logo image</div>
             </div>
+          </div>
+        </div>
+
+        <!-- Address Section -->
+        <div class="card mb-4">
+          <div class="card-header bg-info text-white">
+            <h5 class="mb-0"><i class="bi bi-geo-alt me-2"></i> Address</h5>
+          </div>
+          <div class="card-body">
             <div class="mb-3">
-              <label class="form-label">News Ticker Text</label>
-              <textarea name="news_ticker_text" class="form-control" rows="2">${settings.news_ticker_text || ''}</textarea>
+              <label class="form-label">Organization Address</label>
+              <textarea name="footer_contact" class="form-control" rows="3" placeholder="113, Shivalik Nagar, BHEL, Haridwar, UK, India (249403)&#10;Email: example@email.com&#10;Phone: +91-XXXXXXXXXX" required>${settings.footer_contact || ''}</textarea>
+              <div class="form-text">Enter address, email, and phone (one item per line)</div>
             </div>
+          </div>
+        </div>
+
+        <!-- About Section -->
+        <div class="card mb-4">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="bi bi-file-text me-2"></i> About Us</h5>
+          </div>
+          <div class="card-body">
             <div class="mb-3">
               <label class="form-label">Footer About Text</label>
-              <textarea name="footer_about" class="form-control" rows="3">${settings.footer_about || ''}</textarea>
+              <textarea name="footer_about" class="form-control" rows="4" placeholder="A few lines describing your organization..." required>${settings.footer_about || ''}</textarea>
+              <div class="form-text">This text will appear in the footer of your website</div>
             </div>
-            <div class="mb-3">
-              <label class="form-label">Footer Contact (one item per line)</label>
-              <textarea name="footer_contact" class="form-control" rows="3">${settings.footer_contact || ''}</textarea>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Footer Quick Links (JSON)</label>
-              <textarea name="footer_quick_links_json" class="form-control" rows="3">${settings.footer_quick_links_json || ''}</textarea>
-              <div class="form-text">Example: [{"label":"About Us","url":"/about"}, {"label":"Contact","url":"/contact"}]</div>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Social Links (JSON)</label>
-              <textarea name="social_links_json" class="form-control" rows="3">${settings.social_links_json || ''}</textarea>
-              <div class="form-text">Example: [{"id":"facebook","icon":"bi-facebook","url":"https://..."}, {"id":"instagram","icon":"bi-instagram","url":"https://..."}]</div>
-            </div>
-            <button type="submit" class="btn btn-primary">Save Settings</button>
-          </form>
+          </div>
         </div>
-      </div>
+
+        <!-- News & Updates Section -->
+        <div class="card mb-4">
+          <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0"><i class="bi bi-newspaper me-2"></i> News Ticker</h5>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label class="form-label">Ticker Text</label>
+              <textarea name="news_ticker_text" class="form-control" rows="2" placeholder="Separate news items with • symbol" required>${settings.news_ticker_text || ''}</textarea>
+              <div class="form-text">Latest news that appears in the scrolling ticker on the website header</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer & Navigation Section -->
+        <div class="card mb-4">
+          <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0"><i class="bi bi-link-45deg me-2"></i> Links & Social Media</h5>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label class="form-label">Quick Links (JSON)</label>
+              <textarea name="footer_quick_links_json" class="form-control font-monospace" rows="3" placeholder='[{"label":"About Us","url":"/about"}, {"label":"Contact","url":"/contact"}]'>${settings.footer_quick_links_json || ''}</textarea>
+              <div class="form-text">Format: [{"label":"Link Name","url":"/path"}, ...]</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Social Media Links (JSON)</label>
+              <textarea name="social_links_json" class="form-control font-monospace" rows="4" placeholder='[{"id":"facebook","icon":"bi-facebook","url":"https://..."}, ...]'>${settings.social_links_json || ''}</textarea>
+              <div class="form-text">Format: [{"id":"facebook","icon":"bi-facebook","url":"https://..."}]</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-2"></i>Save All Settings</button>
+          <a href="/admin/dashboard" class="btn btn-secondary">Cancel</a>
+        </div>
+      </form>
     </div>
   </div>
 ` }) %>

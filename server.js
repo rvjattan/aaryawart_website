@@ -192,6 +192,10 @@ app.get('/contact', (req, res) => {
   res.render('public/contact', { title: 'Contact & Locations', submitted: false });
 });
 
+app.get('/testimonials', (req, res) => {
+  res.render('public/testimonials', { title: 'Testimonials', submitted: false });
+});
+
 // API routes
 app.use('/api', apiRoutes);
 

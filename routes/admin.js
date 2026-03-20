@@ -10,6 +10,7 @@ const blogModel = require('../models/blogModel');
 const mediaModel = require('../models/mediaModel');
 const siteSettingsModel = require('../models/siteSettingsModel');
 const contentModel = require('../models/contentModel');
+const testimonialModel = require('../models/testimonialModel');
 
 const router = express.Router();
 
@@ -538,6 +539,56 @@ router.post('/content/home/testimonials/:id/delete', roleRequired(['SUPER_ADMIN'
   try {
     await contentModel.deleteBlock(req.params.id);
     res.redirect('/admin/content/home');
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Testimonials management
+router.get('/testimonials', roleRequired(['SUPER_ADMIN', 'EDITOR', 'MODERATOR']), async (req, res, next) => {
+  try {
+    const { page = 1, status } = req.query;
+    const isApproved = status === 'approved' ? true : status === 'pending' ? false : null;
+    const result = await testimonialModel.getTestimonials({ 
+      page, 
+      limit: 20, 
+      isApproved,
+      sortBy: 'submitted_at',
+      order: 'DESC'
+    });
+    res.render('admin/testimonials/index', {
+      title: 'Testimonials',
+      user: req.user,
+      ...result,
+      filters: { status },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/testimonials/:id/approve', roleRequired(['SUPER_ADMIN', 'EDITOR', 'MODERATOR']), async (req, res, next) => {
+  try {
+    await testimonialModel.approveTestimonial(req.params.id);
+    res.redirect('/admin/testimonials?status=' + (req.query.status || 'pending'));
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/testimonials/:id/reject', roleRequired(['SUPER_ADMIN', 'EDITOR', 'MODERATOR']), async (req, res, next) => {
+  try {
+    await testimonialModel.rejectTestimonial(req.params.id);
+    res.redirect('/admin/testimonials?status=' + (req.query.status || 'pending'));
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/testimonials/:id/delete', roleRequired(['SUPER_ADMIN', 'MODERATOR']), async (req, res, next) => {
+  try {
+    await testimonialModel.deleteTestimonial(req.params.id);
+    res.redirect('/admin/testimonials?status=' + (req.query.status || 'pending'));
   } catch (err) {
     next(err);
   }
