@@ -19,34 +19,29 @@
       </tr>
     </thead>
     <tbody>
-      ${data && data.length > 0 ? data.map(t => \`
-        <tr>
-          <td>\${t.name}</td>
-          <td>\${t.email}</td>
-          <td>\${t.message.substring(0, 50)}...</td>
-          <td>
-            \${t.is_approved ? '<span class="badge bg-success">Approved</span>' : '<span class="badge bg-warning">Pending</span>'}
-          </td>
-          <td>\${new Date(t.submitted_at).toLocaleDateString()}</td>
-          <td class="text-end">
-            \${!t.is_approved ? \`<form method="post" action="/admin/testimonials/\${t.id}/approve\${filters.status ? '?status=' + filters.status : ''}" style="display:inline;"><button type="submit" class="btn btn-sm btn-outline-success" title="Approve"><i class="bi bi-check"></i></button></form>\` : ''}
-            \${t.is_approved ? \`<form method="post" action="/admin/testimonials/\${t.id}/reject\${filters.status ? '?status=' + filters.status : ''}" style="display:inline;"><button type="submit" class="btn btn-sm btn-outline-warning" title="Reject"><i class="bi bi-x"></i></button></form>\` : ''}
-            <form method="post" action="/admin/testimonials/\${t.id}/delete\${filters.status ? '?status=' + filters.status : ''}" style="display:inline;" onsubmit="return confirm('Delete this testimonial?');"><button type="submit" class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></button></form>
-          </td>
-        </tr>
-      \`).join('') : '<tr><td colspan="6" class="text-center text-muted">No testimonials found.</td></tr>'}
+      ${data && data.length > 0 ? data.map(t => {
+        const approveAction = '/admin/testimonials/' + t.id + '/approve' + (filters.status ? '?status=' + filters.status : '');
+        const rejectAction = '/admin/testimonials/' + t.id + '/reject' + (filters.status ? '?status=' + filters.status : '');
+        const deleteAction = '/admin/testimonials/' + t.id + '/delete' + (filters.status ? '?status=' + filters.status : '');
+        return '<tr>' +
+          '<td>' + t.name + '</td>' +
+          '<td>' + t.email + '</td>' +
+          '<td>' + t.message.substring(0, 50) + '...</td>' +
+          '<td>' + (t.is_approved ? '<span class="badge bg-success">Approved</span>' : '<span class="badge bg-warning">Pending</span>') + '</td>' +
+          '<td>' + new Date(t.submitted_at).toLocaleDateString() + '</td>' +
+          '<td class="text-end">' +
+            (!t.is_approved ? '<form method="post" action="' + approveAction + '" style="display:inline;"><button type="submit" class="btn btn-sm btn-outline-success" title="Approve"><i class="bi bi-check"></i></button></form>' : '') +
+            (t.is_approved ? '<form method="post" action="' + rejectAction + '" style="display:inline;"><button type="submit" class="btn btn-sm btn-outline-warning" title="Reject"><i class="bi bi-x"></i></button></form>' : '') +
+            '<form method="post" action="' + deleteAction + '" style="display:inline;" onsubmit="return confirm(\'Delete this testimonial?\');"><button type="submit" class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></button></form>' +
+          '</td>' +
+        '</tr>';
+      }).join('') : '<tr><td colspan="6" class="text-center text-muted">No testimonials found.</td></tr>'}
     </tbody>
   </table>
 
-  ${pages > 1 ? \`
-    <nav>
-      <ul class="pagination">
-        \${Array.from({length: pages}).map((_, i) => {
-          const pageNum = i + 1;
-          const statusParam = filters.status ? '&status=' + filters.status : '';
-          return \`<li class="page-item \${pageNum === parseInt(page) ? 'active' : ''}"><a class="page-link" href="?page=\${pageNum}\${statusParam}">\${pageNum}</a></li>\`;
-        }).join('')}
-      </ul>
-    </nav>
-  \` : ''}
+  ${pages > 1 ? '<nav><ul class="pagination">' + Array.from({length: pages}).map((_, i) => {
+    const pageNum = i + 1;
+    const statusParam = filters.status ? '&status=' + filters.status : '';
+    return '<li class="page-item ' + (pageNum === parseInt(page) ? 'active' : '') + '"><a class="page-link" href="?page=' + pageNum + statusParam + '">' + pageNum + '</a></li>';
+  }).join('') + '</ul></nav>' : ''}
 ` }) %>
