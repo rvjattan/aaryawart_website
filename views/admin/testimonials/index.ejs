@@ -2,9 +2,9 @@
   <h3>Testimonials Management</h3>
   
   <div class="mb-3 d-flex gap-2">
-    <a href="/admin/testimonials" class="btn btn-sm <% if (!filters.status) { %>btn-primary<% } else { %>btn-outline-primary<% } %>">All</a>
-    <a href="/admin/testimonials?status=pending" class="btn btn-sm <% if (filters.status === 'pending') { %>btn-warning<% } else { %>btn-outline-warning<% } %>">Pending</a>
-    <a href="/admin/testimonials?status=approved" class="btn btn-sm <% if (filters.status === 'approved') { %>btn-success<% } else { %>btn-outline-success<% } %>">Approved</a>
+    <a href="/admin/testimonials" class="btn btn-sm ${!filters.status ? 'btn-primary' : 'btn-outline-primary'}">All</a>
+    <a href="/admin/testimonials?status=pending" class="btn btn-sm ${filters.status === 'pending' ? 'btn-warning' : 'btn-outline-warning'}">Pending</a>
+    <a href="/admin/testimonials?status=approved" class="btn btn-sm ${filters.status === 'approved' ? 'btn-success' : 'btn-outline-success'}">Approved</a>
   </div>
 
   <table class="table table-striped table-sm">
@@ -19,52 +19,34 @@
       </tr>
     </thead>
     <tbody>
-      <% if (data && data.length > 0) { %>
-        <% data.forEach(function(t) { %>
-          <tr>
-            <td><%= t.name %></td>
-            <td><%= t.email %></td>
-            <td><%= t.message.substring(0, 50) %>...</td>
-            <td>
-              <% if (t.is_approved) { %>
-                <span class="badge bg-success">Approved</span>
-              <% } else { %>
-                <span class="badge bg-warning">Pending</span>
-              <% } %>
-            </td>
-            <td><%= new Date(t.submitted_at).toLocaleDateString() %></td>
-            <td class="text-end">
-              <% if (!t.is_approved) { %>
-                <form method="post" action="/admin/testimonials/<%= t.id %>/approve<% if (filters.status) { %>?status=<%= filters.status %><% } %>" style="display:inline;">
-                  <button type="submit" class="btn btn-sm btn-outline-success" title="Approve"><i class="bi bi-check"></i></button>
-                </form>
-              <% } %>
-              <% if (t.is_approved) { %>
-                <form method="post" action="/admin/testimonials/<%= t.id %>/reject<% if (filters.status) { %>?status=<%= filters.status %><% } %>" style="display:inline;">
-                  <button type="submit" class="btn btn-sm btn-outline-warning" title="Reject"><i class="bi bi-x"></i></button>
-                </form>
-              <% } %>
-              <form method="post" action="/admin/testimonials/<%= t.id %>/delete<% if (filters.status) { %>?status=<%= filters.status %><% } %>" style="display:inline;" onsubmit="return confirm('Delete this testimonial?');">
-                <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></button>
-              </form>
-            </td>
-          </tr>
-        <% }); %>
-      <% } else { %>
-        <tr><td colspan="6" class="text-center text-muted">No testimonials found.</td></tr>
-      <% } %>
+      ${data && data.length > 0 ? data.map(t => \`
+        <tr>
+          <td>\${t.name}</td>
+          <td>\${t.email}</td>
+          <td>\${t.message.substring(0, 50)}...</td>
+          <td>
+            \${t.is_approved ? '<span class="badge bg-success">Approved</span>' : '<span class="badge bg-warning">Pending</span>'}
+          </td>
+          <td>\${new Date(t.submitted_at).toLocaleDateString()}</td>
+          <td class="text-end">
+            \${!t.is_approved ? \`<form method="post" action="/admin/testimonials/\${t.id}/approve\${filters.status ? '?status=' + filters.status : ''}" style="display:inline;"><button type="submit" class="btn btn-sm btn-outline-success" title="Approve"><i class="bi bi-check"></i></button></form>\` : ''}
+            \${t.is_approved ? \`<form method="post" action="/admin/testimonials/\${t.id}/reject\${filters.status ? '?status=' + filters.status : ''}" style="display:inline;"><button type="submit" class="btn btn-sm btn-outline-warning" title="Reject"><i class="bi bi-x"></i></button></form>\` : ''}
+            <form method="post" action="/admin/testimonials/\${t.id}/delete\${filters.status ? '?status=' + filters.status : ''}" style="display:inline;" onsubmit="return confirm('Delete this testimonial?');"><button type="submit" class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></button></form>
+          </td>
+        </tr>
+      \`).join('') : '<tr><td colspan="6" class="text-center text-muted">No testimonials found.</td></tr>'}
     </tbody>
   </table>
 
-  <% if (pages > 1) { %>
+  ${pages > 1 ? \`
     <nav>
       <ul class="pagination">
-        <% for (let i = 1; i <= (pages || 1); i++) { %>
-          <li class="page-item <% if (i === parseInt(page)) { %>active<% } %>">
-            <a class="page-link" href="?page=<%= i %><% if (filters.status) { %>&status=<%= filters.status %><% } %>"><%= i %></a>
-          </li>
-        <% } %>
+        \${Array.from({length: pages}).map((_, i) => {
+          const pageNum = i + 1;
+          const statusParam = filters.status ? '&status=' + filters.status : '';
+          return \`<li class="page-item \${pageNum === parseInt(page) ? 'active' : ''}"><a class="page-link" href="?page=\${pageNum}\${statusParam}">\${pageNum}</a></li>\`;
+        }).join('')}
       </ul>
     </nav>
-  <% } %>
+  \` : ''}
 ` }) %>
