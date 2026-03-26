@@ -1,8 +1,4 @@
 require('dotenv').config();
-console.log('DB_PASSWORD from env:', process.env.DB_PASSWORD);
-console.log('DB_USER from env:', process.env.DB_USER);
-
-// ... rest of your server.js code
 const path = require('path');
 const express = require('express');
 const helmet = require('helmet');

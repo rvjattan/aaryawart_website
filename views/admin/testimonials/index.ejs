@@ -1,13 +1,17 @@
 <%- include('../layout', { title, user, body: `
-  <h3>Testimonials Management</h3>
-  
-  <div class="mb-3">
-    <a href="/admin/testimonials" class="btn btn-sm ${!filters.status ? 'btn-primary' : 'btn-outline-primary'}">All</a>
-    <a href="/admin/testimonials?status=pending" class="btn btn-sm ${filters.status === 'pending' ? 'btn-warning' : 'btn-outline-warning'}">Pending</a>
-    <a href="/admin/testimonials?status=approved" class="btn btn-sm ${filters.status === 'approved' ? 'btn-success' : 'btn-outline-success'}">Approved</a>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="heading-no-margin">Testimonials Management</h3>
   </div>
 
-  <table class="table table-striped">
+<div class="mb-3">
+    <a href="/admin/testimonials" class="btn btn-sm ${!filters.status ? 'btn-primary' : 'btn-outline-primary'}">All</a>
+    <a href="/admin/testimonials?status=pending" class="btn btn-sm ${filters.status === 'pending' ? 'btn-warning' : 'btn-outline-warning'}">Pending (${total ? data.filter(t => !t.is_approved).length : 0})</a>
+    <a href="/admin/testimonials?status=approved" class="btn btn-sm ${filters.status === 'approved' ? 'btn-success' : 'btn-outline-success'}">Approved (${total ? data.filter(t => t.is_approved).length : 0})</a>
+  </div>
+
+  ${total === 0 ? '<div class="alert alert-info">No testimonials yet. Submitted testimonials will appear here for approval.</div>' : ''}
+
+  <table class="table table-striped table-sm">
     <thead>
       <tr>
         <th>Name</th>
@@ -20,22 +24,22 @@
     </thead>
     <tbody>
       ${(data && data.length > 0) ? data.map(t => {
-        let html = '<tr><td>' + t.name + '</td>';
-        html += '<td>' + t.email + '</td>';
-        html += '<td>' + t.message.substring(0, 40) + '...</td>';
-        html += '<td>' + (t.is_approved ? '<span class="badge bg-success">Approved</span>' : '<span class="badge bg-warning">Pending</span>') + '</td>';
-        html += '<td>' + new Date(t.submitted_at).toLocaleDateString() + '</td>';
-        html += '<td>';
+        let html = '<tr><td><strong>' + (t.name || '(Unknown)') + '</strong></td>';
+        html += '<td><small>' + (t.email || '(No email)') + '</small></td>';
+        html += '<td><small>' + (t.message ? t.message.substring(0, 50) + (t.message.length > 50 ? '...' : '') : '(Empty)') + '</small></td>';
+        html += '<td>' + (t.is_approved ? '<span class="badge bg-success">Approved</span>' : '<span class="badge bg-warning text-dark">Pending</span>') + '</td>';
+        html += '<td><small>' + (t.submitted_at ? new Date(t.submitted_at).toLocaleDateString() : 'N/A') + '</small></td>';
+        html += '<td style="white-space: nowrap;">';
         if (!t.is_approved) {
-          html += '<form method="post" action="/admin/testimonials/' + t.id + '/approve' + (filters.status ? '?status=' + filters.status : '') + '" class="form-inline-display"><button class="btn btn-sm btn-success" type="submit">Approve</button></form> ';
+          html += '<button type="button" class="btn btn-sm btn-success" data-action="approve" data-id="' + t.id + '" data-status="' + (filters.status || 'pending') + '">Approve</button> ';
         }
         if (t.is_approved) {
-          html += '<form method="post" action="/admin/testimonials/' + t.id + '/reject' + (filters.status ? '?status=' + filters.status : '') + '" class="form-inline-display"><button class="btn btn-sm btn-warning" type="submit">Reject</button></form> ';
+          html += '<button type="button" class="btn btn-sm btn-warning" data-action="reject" data-id="' + t.id + '" data-status="' + (filters.status || 'approved') + '">Reject</button> ';
         }
-        html += '<form method="post" action="/admin/testimonials/' + t.id + '/delete' + (filters.status ? '?status=' + filters.status : '') + '" class="form-inline-display" onsubmit="return true;"><button class="btn btn-sm btn-danger" type="submit">Delete</button></form>';
+        html += '<button type="button" class="btn btn-sm btn-danger" data-action="delete" data-id="' + t.id + '" data-status="' + (filters.status || 'pending') + '">Delete</button>';
         html += '</td></tr>';
         return html;
-      }).join('') : '<tr><td colspan="6" class="text-center text-muted">No testimonials found</td></tr>'}
+      }).join('') : '<tr><td colspan="6" class="text-center text-muted py-4">No testimonials found</td></tr>'}
     </tbody>
   </table>
 
@@ -48,4 +52,24 @@
     html += '</ul></nav>';
     return html;
   })() : ''}
+
+  <script>
+    document.querySelectorAll('[data-action]').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const action = e.target.dataset.action;
+        const id = e.target.dataset.id;
+        const statusParam = e.target.dataset.status ? '?status=' + e.target.dataset.status : '';
+        
+        if (action === 'delete' && !confirm('Are you sure you want to delete this testimonial?')) {
+          return;
+        }
+        
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/admin/testimonials/' + id + '/' + action + statusParam;
+        document.body.appendChild(form);
+        form.submit();
+      });
+    });
+  </script>
 ` }) %>
