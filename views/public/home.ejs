@@ -107,7 +107,7 @@
     <main>
 
 <% var heroExtra = {}; try { heroExtra = hero && hero.extra_json ? JSON.parse(hero.extra_json) : {}; } catch (e) { heroExtra = {}; } %>
-<section class="hero-section text-white d-flex align-items-center" style="background-image: url('<%= heroExtra.backgroundImage || '/static/images/hero.jpg' %>');">
+<section class="hero-section text-white d-flex align-items-center" <% if (heroExtra.backgroundImage) { %>data-bg-image="<%= heroExtra.backgroundImage %>"<% } %>>
   <div class="container py-5">
     <div class="row align-items-center">
       <div class="col-md-7">
@@ -273,5 +273,12 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/static/js/main.js"></script>
+    <script>
+      // Apply background image from data attribute if present
+      const heroSection = document.querySelector('.hero-section');
+      if (heroSection && heroSection.dataset.bgImage) {
+        heroSection.style.backgroundImage = "url('" + heroSection.dataset.bgImage + "')";
+      }
+    </script>
   </body>
 </html>
