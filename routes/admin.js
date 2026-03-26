@@ -405,13 +405,18 @@ router.get('/users', roleRequired(['SUPER_ADMIN']), async (req, res, next) => {
   }
 });
 
-router.get('/users/new', roleRequired(['SUPER_ADMIN']), (req, res) => {
-  res.render('admin/users/form', {
-    title: 'Create New Admin',
-    user: req.user,
-    admin: {},
-    mode: 'create',
-  });
+router.get('/users/new', roleRequired(['SUPER_ADMIN']), (req, res, next) => {
+  try {
+    res.render('admin/users/form', {
+      title: 'Create New Admin',
+      user: req.user,
+      admin: {},
+      mode: 'create',
+      error: null,
+    });
+  } catch (err) {
+    next(err);
+  }
 });
 
 router.post('/users', roleRequired(['SUPER_ADMIN']), async (req, res, next) => {
