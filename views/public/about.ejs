@@ -92,10 +92,14 @@
       </nav>
       <div class="news-ticker bg-warning text-dark">
         <div class="container">
-          <span class="fw-bold me-2">Latest:</span>
-          <marquee behavior="scroll" direction="left">
-            <%= (settings && settings.news_ticker_text) || 'Upcoming health camp in rural districts • National youth leadership workshop • Flood relief volunteer deployment • New education centers inaugurated' %>
-          </marquee>
+          <div class="ticker-wrapper">
+            <span class="fw-bold me-2 ticker-label">Latest:</span>
+            <div class="ticker-content">
+              <span class="ticker-text">
+                <%= (settings && settings.news_ticker_text) || 'Upcoming health camp in rural districts • National youth leadership workshop • Flood relief volunteer deployment • New education centers inaugurated' %>
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </header>
