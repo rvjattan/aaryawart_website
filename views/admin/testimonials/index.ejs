@@ -27,12 +27,12 @@
         html += '<td>' + new Date(t.submitted_at).toLocaleDateString() + '</td>';
         html += '<td>';
         if (!t.is_approved) {
-          html += '<form method="post" action="/admin/testimonials/' + t.id + '/approve' + (filters.status ? '?status=' + filters.status : '') + '" style="display:inline;"><button class="btn btn-sm btn-success" type="submit">Approve</button></form> ';
+          html += '<form method="post" action="/admin/testimonials/' + t.id + '/approve' + (filters.status ? '?status=' + filters.status : '') + '" class="form-inline-display"><button class="btn btn-sm btn-success" type="submit">Approve</button></form> ';
         }
         if (t.is_approved) {
-          html += '<form method="post" action="/admin/testimonials/' + t.id + '/reject' + (filters.status ? '?status=' + filters.status : '') + '" style="display:inline;"><button class="btn btn-sm btn-warning" type="submit">Reject</button></form> ';
+          html += '<form method="post" action="/admin/testimonials/' + t.id + '/reject' + (filters.status ? '?status=' + filters.status : '') + '" class="form-inline-display"><button class="btn btn-sm btn-warning" type="submit">Reject</button></form> ';
         }
-        html += '<form method="post" action="/admin/testimonials/' + t.id + '/delete' + (filters.status ? '?status=' + filters.status : '') + '" style="display:inline;" onsubmit="return true;"><button class="btn btn-sm btn-danger" type="submit">Delete</button></form>';
+        html += '<form method="post" action="/admin/testimonials/' + t.id + '/delete' + (filters.status ? '?status=' + filters.status : '') + '" class="form-inline-display" onsubmit="return true;"><button class="btn btn-sm btn-danger" type="submit">Delete</button></form>';
         html += '</td></tr>';
         return html;
       }).join('') : '<tr><td colspan="6" class="text-center text-muted">No testimonials found</td></tr>'}

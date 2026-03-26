@@ -34,6 +34,41 @@ a, button, .btn, input, select, textarea {
   }
 }
 
+/* Site name typography */
+.site-name-desktop {
+  font-size: clamp(0.9rem, 3vw, 1rem);
+}
+
+.site-name-mobile {
+  font-size: clamp(0.9rem, 5vw, 1.1rem);
+}
+
+/* Button utilities */
+.btn-no-min-width {
+  min-width: 0;
+}
+
+/* Iframe styling */
+.iframe-no-border {
+  border: 0;
+}
+
+/* Heading utilities */
+.heading-no-margin {
+  margin: 0;
+}
+
+/* Form styling */
+.form-inline-display {
+  display: inline;
+}
+
+/* Login page styling */
+.min-height-vh100 {
+  min-height: 100vh;
+}
+
+/* Hero section with CSS variables */
 .hero-section {
   background-size: cover;
   background-position: center;
