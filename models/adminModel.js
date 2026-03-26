@@ -54,6 +54,11 @@ async function updateAdminRole(id, role) {
   await pool.query('UPDATE admins SET role = ? WHERE id = ?', [role, id]);
 }
 
+async function deleteAdmin(id) {
+  const [result] = await pool.query('DELETE FROM admins WHERE id = ?', [id]);
+  return result.affectedRows > 0;
+}
+
 module.exports = {
   findByUsername,
   findByEmail,
@@ -63,5 +68,6 @@ module.exports = {
   updateAdminPasswordById,
   listAdmins,
   updateAdminRole,
+  deleteAdmin,
 };
 

@@ -4,7 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { generateToken, authRequired, roleRequired } = require('../middleware/auth');
-const { findByUsername, listAdmins, updateAdminRole, createAdmin, findByEmail } = require('../models/adminModel');
+const { findByUsername, listAdmins, updateAdminRole, createAdmin, findByEmail, deleteAdmin } = require('../models/adminModel');
 const volunteerModel = require('../models/volunteerModel');
 const blogModel = require('../models/blogModel');
 const mediaModel = require('../models/mediaModel');
@@ -480,6 +480,22 @@ router.post('/users/:id/role', roleRequired(['SUPER_ADMIN']), async (req, res, n
   try {
     const { role } = req.body;
     await updateAdminRole(req.params.id, role);
+    res.redirect('/admin/users');
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/users/:id/delete', roleRequired(['SUPER_ADMIN']), async (req, res, next) => {
+  try {
+    const adminId = req.params.id;
+    
+    // Prevent deleting your own account
+    if (adminId == req.user.id) {
+      return res.status(400).send('Cannot delete your own account');
+    }
+
+    await deleteAdmin(adminId);
     res.redirect('/admin/users');
   } catch (err) {
     next(err);

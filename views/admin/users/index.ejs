@@ -23,14 +23,19 @@
           <td>${a.role}</td>
           <td>${new Date(a.created_at).toLocaleDateString()}</td>
           <td>
-            <form method="post" action="/admin/users/${a.id}/role" class="d-flex gap-1">
-              <select name="role" class="form-select form-select-sm">
-                <option value="SUPER_ADMIN" ${a.role === 'SUPER_ADMIN' ? 'selected' : ''}>Super Admin</option>
-                <option value="EDITOR" ${a.role === 'EDITOR' ? 'selected' : ''}>Editor</option>
-                <option value="MODERATOR" ${a.role === 'MODERATOR' ? 'selected' : ''}>Moderator</option>
-              </select>
-              <button class="btn btn-sm btn-outline-primary">Update</button>
-            </form>
+            <div class="d-flex gap-1">
+              <form method="post" action="/admin/users/${a.id}/role" class="d-flex gap-1">
+                <select name="role" class="form-select form-select-sm">
+                  <option value="SUPER_ADMIN" ${a.role === 'SUPER_ADMIN' ? 'selected' : ''}>Super Admin</option>
+                  <option value="EDITOR" ${a.role === 'EDITOR' ? 'selected' : ''}>Editor</option>
+                  <option value="MODERATOR" ${a.role === 'MODERATOR' ? 'selected' : ''}>Moderator</option>
+                </select>
+                <button class="btn btn-sm btn-outline-primary">Update</button>
+              </form>
+              <form method="post" action="/admin/users/${a.id}/delete" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this admin?');">
+                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+              </form>
+            </div>
           </td>
         </tr>
       `).join('')}
