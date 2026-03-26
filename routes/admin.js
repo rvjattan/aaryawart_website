@@ -4,7 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { generateToken, authRequired, roleRequired } = require('../middleware/auth');
-const { findByUsername, listAdmins, updateAdminRole } = require('../models/adminModel');
+const { findByUsername, listAdmins, updateAdminRole, createAdmin, findByEmail } = require('../models/adminModel');
 const volunteerModel = require('../models/volunteerModel');
 const blogModel = require('../models/blogModel');
 const mediaModel = require('../models/mediaModel');
@@ -400,6 +400,72 @@ router.get('/users', roleRequired(['SUPER_ADMIN']), async (req, res, next) => {
       user: req.user,
       admins,
     });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get('/users/new', roleRequired(['SUPER_ADMIN']), (req, res) => {
+  res.render('admin/users/form', {
+    title: 'Create New Admin',
+    user: req.user,
+    admin: {},
+    mode: 'create',
+  });
+});
+
+router.post('/users', roleRequired(['SUPER_ADMIN']), async (req, res, next) => {
+  try {
+    const { username, email, password, role } = req.body;
+
+    // Validation
+    if (!username || !email || !password || !role) {
+      return res.status(400).render('admin/users/form', {
+        title: 'Create New Admin',
+        user: req.user,
+        admin: { username, email, role },
+        mode: 'create',
+        error: 'All fields are required',
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).render('admin/users/form', {
+        title: 'Create New Admin',
+        user: req.user,
+        admin: { username, email, role },
+        mode: 'create',
+        error: 'Password must be at least 6 characters long',
+      });
+    }
+
+    // Check if username already exists
+    const existingUsername = await findByUsername(username);
+    if (existingUsername) {
+      return res.status(400).render('admin/users/form', {
+        title: 'Create New Admin',
+        user: req.user,
+        admin: { username, email, role },
+        mode: 'create',
+        error: 'Username already exists',
+      });
+    }
+
+    // Check if email already exists
+    const existingEmail = await findByEmail(email);
+    if (existingEmail) {
+      return res.status(400).render('admin/users/form', {
+        title: 'Create New Admin',
+        user: req.user,
+        admin: { username, email, role },
+        mode: 'create',
+        error: 'Email already exists',
+      });
+    }
+
+    // Create the admin
+    await createAdmin({ username, email, password, role });
+    res.redirect('/admin/users');
   } catch (err) {
     next(err);
   }
