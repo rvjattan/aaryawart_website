@@ -489,4 +489,50 @@ a, button, .btn, input, select, textarea {
   }
 }
 
+/* Form validation styles */
+.invalid-feedback {
+  display: block;
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
 
+.invalid-feedback.d-none {
+  display: none !important;
+}
+
+.form-control:invalid {
+  border-color: #dc3545;
+}
+
+.form-control:invalid:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+/* Text danger utility extensions */
+.text-danger {
+  font-size: 0.875rem;
+}
+
+/* Form field spacing improvements */
+.form-control, .form-select {
+  margin-bottom: 0.25rem;
+}
+
+.form-label {
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.form-label .text-danger {
+  margin-left: 0.125rem;
+}
+
+/* Small helper text styling */
+.form-text {
+  font-size: 0.875rem;
+  color: #6c757d;
+  display: block;
+  margin-top: 0.25rem;
+}

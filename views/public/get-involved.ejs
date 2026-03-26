@@ -113,28 +113,64 @@
           <form id="volunteer-form">
             <div class="row">
               <div class="col-md-6 mb-3">
-                <label class="form-label">Name</label>
+                <label class="form-label">Name <span class="text-danger">*</span></label>
                 <input type="text" name="name" class="form-control" required />
               </div>
               <div class="col-md-6 mb-3">
-                <label class="form-label">Email</label>
-                <input type="email" name="email" class="form-control" required />
+                <label class="form-label">Email <span class="text-danger">*</span></label>
+                <input 
+                  type="email" 
+                  name="email" 
+                  id="email-input"
+                  class="form-control" 
+                  required 
+                />
+                <div class="invalid-feedback d-block d-none" id="email-error"></div>
               </div>
             </div>
             <div class="row">
               <div class="col-md-6 mb-3">
-                <label class="form-label">Phone</label>
-                <input type="text" name="phone" class="form-control" required />
+                <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
+                <input 
+                  type="tel" 
+                  name="phone" 
+                  class="form-control" 
+                  id="phone-input"
+                  maxlength="20"
+                  required 
+                />
+                <small class="text-muted d-block mt-1">Minimum 10 digits. Cannot start with 0, 1, 2, 3, 4, or 5.</small>
+                <div class="invalid-feedback d-block d-none" id="phone-error"></div>
               </div>
               <div class="col-md-6 mb-3">
-                <label class="form-label">State</label>
-                <input type="text" name="state" class="form-control" />
+                <label class="form-label">State <span class="text-danger">*</span></label>
+                <input 
+                  type="text" 
+                  name="state" 
+                  id="state-input"
+                  class="form-control"
+                  list="states-list"
+                  required
+                  autocomplete="off"
+                />
+                <datalist id="states-list"></datalist>
+                <div class="invalid-feedback d-block d-none" id="state-error"></div>
               </div>
             </div>
             <div class="row">
               <div class="col-md-6 mb-3">
-                <label class="form-label">City</label>
-                <input type="text" name="city" class="form-control" />
+                <label class="form-label">City <span class="text-danger">*</span></label>
+                <input 
+                  type="text" 
+                  name="city" 
+                  id="city-input"
+                  class="form-control"
+                  list="cities-list"
+                  required
+                  autocomplete="off"
+                />
+                <datalist id="cities-list"></datalist>
+                <div class="invalid-feedback d-block d-none" id="city-error"></div>
               </div>
               <div class="col-md-6 mb-3">
                 <label class="form-label">Availability</label>
@@ -195,15 +231,139 @@
     </div>
   </section>
 
+  <script src="/static/js/states-cities.js"></script>
   <script>
+    // Validation functions
+    const validators = {
+      email: (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+      },
+      phone: (phone) => {
+        // Remove all non-digits
+        const digitsOnly = phone.replace(/\D/g, '');
+        // Check if at least 10 digits
+        if (digitsOnly.length < 10) return false;
+        // Check if first digit is not 0-5
+        const firstDigit = parseInt(digitsOnly[0]);
+        return firstDigit > 5;
+      }
+    };
+
+    // Initialize state and city autocomplete
+    document.addEventListener('DOMContentLoaded', () => {
+      const stateInput = document.getElementById('state-input');
+      const cityInput = document.getElementById('city-input');
+      const statesList = document.getElementById('states-list');
+      const citiesList = document.getElementById('cities-list');
+
+      // Populate initial state suggestions
+      function updateStatesSuggestions(value) {
+        if (typeof getStatesSuggestions !== 'function') return;
+        const suggestions = getStatesSuggestions(value);
+        statesList.innerHTML = suggestions.map(s => `<option value="${s}">`).join('');
+      }
+
+      // Populate city suggestions based on selected state
+      function updateCitiesSuggestions() {
+        if (typeof getCitiesSuggestions !== 'function') return;
+        const selectedState = stateInput.value;
+        const cityValue = cityInput.value;
+        const suggestions = getCitiesSuggestions(selectedState, cityValue);
+        citiesList.innerHTML = suggestions.map(c => `<option value="${c}">`).join('');
+      }
+
+      // State input listeners
+      stateInput.addEventListener('input', (e) => {
+        updateStatesSuggestions(e.target.value);
+      });
+
+      stateInput.addEventListener('change', (e) => {
+        updateStatesSuggestions(e.target.value);
+        // Reset city when state changes
+        cityInput.value = '';
+        updateCitiesSuggestions();
+      });
+
+      // City input listeners
+      cityInput.addEventListener('input', (e) => {
+        updateCitiesSuggestions();
+      });
+
+      // Initialize with all states on first load
+      updateStatesSuggestions('');
+    });
+
+    // Form submission with validation
     const form = document.getElementById('volunteer-form');
     const alertBox = document.getElementById('volunteer-alert');
+
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       alertBox.classList.add('d-none');
+
+      // Get form values
+      const email = form.email.value.trim();
+      const phone = form.phone.value.trim();
+      const state = form.state.value.trim();
+      const city = form.city.value.trim();
+
+      // Validate email
+      if (!validators.email(email)) {
+        const emailInput = form.email;
+        const errorEl = document.getElementById('email-error') || createErrorElement('email-error', emailInput);
+        errorEl.textContent = 'Please enter a valid email address.';
+        errorEl.classList.remove('d-none');
+        return;
+      } else {
+        const errorEl = document.getElementById('email-error');
+        if (errorEl) errorEl.classList.add('d-none');
+      }
+
+      // Validate phone
+      if (!validators.phone(phone)) {
+        const phoneError = document.getElementById('phone-error');
+        const digitsOnly = phone.replace(/\D/g, '');
+        if (digitsOnly.length < 10) {
+          phoneError.textContent = 'Mobile number must have at least 10 digits.';
+        } else {
+          const firstDigit = parseInt(digitsOnly[0]);
+          phoneError.textContent = 'Mobile number cannot start with 0, 1, 2, 3, 4, or 5.';
+        }
+        phoneError.classList.remove('d-none');
+        return;
+      } else {
+        const phoneError = document.getElementById('phone-error');
+        phoneError.classList.add('d-none');
+      }
+
+      // Validate state
+      if (!state) {
+        const stateError = document.getElementById('state-error');
+        stateError.textContent = 'Please select a state.';
+        stateError.classList.remove('d-none');
+        return;
+      } else {
+        const stateError = document.getElementById('state-error');
+        stateError.classList.add('d-none');
+      }
+
+      // Validate city
+      if (!city) {
+        const cityError = document.getElementById('city-error');
+        cityError.textContent = 'Please select a city.';
+        cityError.classList.remove('d-none');
+        return;
+      } else {
+        const cityError = document.getElementById('city-error');
+        cityError.classList.add('d-none');
+      }
+
+      // All validations passed, submit form
       const formData = new FormData(form);
       const payload = {};
       formData.forEach((v, k) => payload[k] = v);
+
       fetch('/api/volunteers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -216,16 +376,33 @@
           alertBox.textContent = 'Thank you for registering as a volunteer. We will contact you soon.';
           alertBox.classList.remove('d-none');
           form.reset();
+          // Reset autocomplete lists
+          document.getElementById('states-list').innerHTML = '';
+          document.getElementById('cities-list').innerHTML = '';
+          if (typeof getStatesSuggestions === 'function') {
+            document.getElementById('states-list').innerHTML = getStatesSuggestions('').map(s => `<option value="${s}">`).join('');
+          }
         } else {
-          throw new Error('Submission failed');
+          alertBox.className = 'alert alert-danger';
+          alertBox.textContent = 'Error: ' + (res.message || 'Failed to submit form');
+          alertBox.classList.remove('d-none');
         }
       })
-      .catch(() => {
+      .catch((err) => {
         alertBox.className = 'alert alert-danger';
-        alertBox.textContent = 'There was an error submitting the form. Please try again later.';
+        alertBox.textContent = 'Network error: ' + err.message;
         alertBox.classList.remove('d-none');
       });
     });
+
+    // Helper function to create error element if it doesn't exist
+    function createErrorElement(id, referenceElement) {
+      const errorEl = document.createElement('div');
+      errorEl.id = id;
+      errorEl.className = 'invalid-feedback d-block d-none';
+      referenceElement.parentElement.appendChild(errorEl);
+      return errorEl;
+    }
   </script>
 
     </main>

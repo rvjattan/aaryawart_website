@@ -30,9 +30,58 @@ function createTransporter() {
   });
 }
 
+// Validation functions for volunteer registration
+function validateVolunteerData(data) {
+  const errors = {};
+
+  // Validate name
+  if (!data.name || !data.name.trim()) {
+    errors.name = 'Name is required';
+  }
+
+  // Validate email
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!data.email || !emailRegex.test(data.email)) {
+    errors.email = 'Valid email address is required';
+  }
+
+  // Validate phone
+  const digitsOnly = (data.phone || '').replace(/\D/g, '');
+  if (digitsOnly.length < 10) {
+    errors.phone = 'Mobile number must have at least 10 digits';
+  } else {
+    const firstDigit = parseInt(digitsOnly[0]);
+    if (firstDigit <= 5) {
+      errors.phone = 'Mobile number cannot start with 0, 1, 2, 3, 4, or 5';
+    }
+  }
+
+  // Validate state
+  if (!data.state || !data.state.trim()) {
+    errors.state = 'State is required';
+  }
+
+  // Validate city
+  if (!data.city || !data.city.trim()) {
+    errors.city = 'City is required';
+  }
+
+  return errors;
+}
+
 // Public API: create volunteer (from Get Involved form)
 router.post('/volunteers', async (req, res, next) => {
   try {
+    // Validate input data
+    const validationErrors = validateVolunteerData(req.body);
+    if (Object.keys(validationErrors).length > 0) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Validation failed',
+        errors: validationErrors 
+      });
+    }
+
     const volunteer = await createVolunteer(req.body);
     await statsModel.incrementCounter('volunteers_registered', 1);
 
