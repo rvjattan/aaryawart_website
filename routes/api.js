@@ -258,6 +258,11 @@ router.post('/testimonials', async (req, res, next) => {
     const testimonial = await testimonialModel.createTestimonial(name, email, message);
     res.status(201).json({ success: true, data: testimonial, message: 'Thank you for your testimonial! It will be displayed after approval.' });
   } catch (err) {
+    console.error('[POST /api/testimonials] Error creating testimonial:', {
+      error: err.message,
+      code: err.code,
+      body: req.body
+    });
     next(err);
   }
 });

@@ -186,19 +186,24 @@
         const formData = new FormData(this);
         
         try {
+          const name = formData.get('name');
+          const email = formData.get('email');
+          const message = formData.get('message');
+          
+          console.log('[Testimonial Form] Submitting:', { name, email, messageLength: message.length });
+          
           const response = await fetch('/api/testimonials', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-              name: formData.get('name'),
-              email: formData.get('email'),
-              message: formData.get('message'),
-            }),
+            body: JSON.stringify({ name, email, message }),
           });
           
+          console.log('[Testimonial Form] Response status:', response.status);
+          
           const result = await response.json();
+          console.log('[Testimonial Form] Response body:', result);
           
           if (result.success) {
             alert.className = 'alert alert-success';
@@ -206,12 +211,13 @@
             this.reset();
           } else {
             alert.className = 'alert alert-danger';
-            alert.innerHTML = '<i class="bi bi-exclamation-circle"></i> ' + (result.message || 'An error occurred');
+            alert.innerHTML = '<i class="bi bi-exclamation-circle"></i> ' + (result.message || 'An error occurred. Please try again.');
           }
           alert.classList.remove('d-none');
         } catch (err) {
+          console.error('[Testimonial Form] Error:', err);
           alert.className = 'alert alert-danger';
-          alert.innerHTML = '<i class="bi bi-exclamation-circle"></i> An error occurred. Please try again.';
+          alert.innerHTML = '<i class="bi bi-exclamation-circle"></i> Network error. Please check your connection and try again.';
           alert.classList.remove('d-none');
         }
       });
