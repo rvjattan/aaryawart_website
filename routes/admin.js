@@ -39,18 +39,23 @@ router.get('/login', (req, res) => {
 });
 
 router.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-  const admin = await findByUsername(username);
-  if (!admin) {
-    return res.render('admin/login', { title: 'Admin Login', error: 'Invalid credentials' });
+  try {
+    const { username, password } = req.body;
+    const admin = await findByUsername(username);
+    if (!admin) {
+      return res.render('admin/login', { title: 'Admin Login', error: 'Invalid credentials' });
+    }
+    const match = await bcrypt.compare(password, admin.password_hash);
+    if (!match) {
+      return res.render('admin/login', { title: 'Admin Login', error: 'Invalid credentials' });
+    }
+    const token = generateToken(admin);
+    res.cookie('token', token, { httpOnly: true, sameSite: 'lax' });
+    res.redirect('/admin/dashboard');
+  } catch (err) {
+    console.error('[POST /admin/login] Authentication error:', err.message);
+    res.render('admin/login', { title: 'Admin Login', error: 'Authentication error. Check server logs.' });
   }
-  const match = await bcrypt.compare(password, admin.password_hash);
-  if (!match) {
-    return res.render('admin/login', { title: 'Admin Login', error: 'Invalid credentials' });
-  }
-  const token = generateToken(admin);
-  res.cookie('token', token, { httpOnly: true, sameSite: 'lax' });
-  res.redirect('/admin/dashboard');
 });
 
 router.get('/logout', (req, res) => {

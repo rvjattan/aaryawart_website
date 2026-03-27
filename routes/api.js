@@ -83,7 +83,13 @@ router.post('/volunteers', async (req, res, next) => {
     }
 
     const volunteer = await createVolunteer(req.body);
-    await statsModel.incrementCounter('volunteers_registered', 1);
+
+    try {
+      await statsModel.incrementCounter('volunteers_registered', 1);
+    } catch (metricErr) {
+      console.warn('[createVolunteer] stats increment failed', metricErr.message);
+      // continue without failing the request
+    }
 
     // Send confirmation email (best-effort, errors ignored)
     if (process.env.SMTP_HOST && volunteer.email) {
