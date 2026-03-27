@@ -277,5 +277,25 @@ router.get('/testimonials', async (req, res, next) => {
   }
 });
 
+// Diagnostic endpoint - test database connection (remove in production)
+router.get('/health/db', async (req, res) => {
+  try {
+    const [result] = await require('../config/db').query('SELECT 1 as connected');
+    res.json({ 
+      success: true, 
+      message: 'Database connected',
+      timestamp: new Date().toISOString()
+    });
+  } catch (err) {
+    res.status(500).json({ 
+      success: false, 
+      message: 'Database connection failed',
+      error: err.message,
+      code: err.code,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 module.exports = router;
 

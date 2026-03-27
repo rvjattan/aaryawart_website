@@ -7,11 +7,24 @@ async function createTestimonial(name, email, message) {
        VALUES (?, ?, ?, FALSE)`,
       [name, email, message]
     );
+    
+    if (!result.insertId) {
+      throw new Error('Failed to insert testimonial - no insert ID returned');
+    }
+    
     return { id: result.insertId, name, email, message, is_approved: false };
   } catch (err) {
     if (err && err.code === 'ER_NO_SUCH_TABLE') {
-      console.error('Testimonials table does not exist. Please run the schema migration.');
+      const error = new Error('Testimonials table does not exist. Please run: mysql -u root -p charity_org < db/schema.sql');
+      console.error(error.message);
+      throw error;
     }
+    if (err && err.code === 'PROTOCOL_ERROR') {
+      const error = new Error('Database connection lost. Please check database server.');
+      console.error(error.message);
+      throw error;
+    }
+    // Re-throw with original error intact
     throw err;
   }
 }
