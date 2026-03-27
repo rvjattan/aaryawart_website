@@ -15,3 +15,6 @@ const pool = mysql.createPool({
 
 module.exports = pool;
 
+pool.query('SELECT DATABASE() as db').then(([r]) => {
+  console.log('Connected to database:', r[0].db);
+}).catch(console.error);
