@@ -649,7 +649,6 @@ router.get('/testimonials', roleRequired(['SUPER_ADMIN', 'EDITOR', 'MODERATOR'])
       });
     } catch (dbErr) {
       console.error('Error fetching testimonials:', dbErr.message);
-      // Return empty result instead of crashing
     }
     
     res.render('admin/testimonials/index', {

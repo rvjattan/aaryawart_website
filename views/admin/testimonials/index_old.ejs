@@ -1,0 +1,3 @@
+<%- include('../layout', { title, user, body: `
+  ` + require('fs').readFileSync(require('path').join(__dirname, 'list.ejs'), 'utf-8').replace(/<%/g, '<%').replace(/%>/g, '%>') + `
+` }) %>
