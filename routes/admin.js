@@ -663,6 +663,45 @@ router.get('/content/home', roleRequired(['SUPER_ADMIN', 'EDITOR']), async (req,
     const vision = (await contentModel.getBlocks('home', 'vision'))[0] || null;
     const approach = (await contentModel.getBlocks('home', 'approach'))[0] || null;
     const testimonials = await contentModel.getBlocks('home', 'testimonials');
+    
+    // Build testimonials HTML to avoid complex nested template literals
+    let testimonialsHtml = '';
+    if (!testimonials || !testimonials.length) {
+      testimonialsHtml = '<p class="text-muted small">No testimonials yet. Add one using the button above.</p>';
+    } else {
+      testimonialsHtml = '<ul class="list-group">';
+      testimonials.forEach(t => {
+        let extra = {};
+        try {
+          extra = t.extra_json ? JSON.parse(t.extra_json) : {};
+        } catch (e) {
+          extra = {};
+        }
+        testimonialsHtml += `<li class="list-group-item">
+          <form method="post" action="/admin/content/home/section/testimonials">
+            <input type="hidden" name="id" value="${t.id}" />
+            <div class="mb-1">
+              <label class="form-label small mb-0">Quote</label>
+              <textarea name="body" class="form-control form-control-sm" rows="2">${(t.body || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
+            </div>
+            <div class="mb-1">
+              <label class="form-label small mb-0">Attribution (name / role)</label>
+              <input type="text" name="title" class="form-control form-control-sm" value="${(extra.attribution || t.title || '').replace(/"/g, '&quot;')}" />
+            </div>
+            <div class="mb-2">
+              <label class="form-label small mb-0">Extra JSON (optional)</label>
+              <textarea name="extra_json" class="form-control form-control-sm" rows="2">${(t.extra_json || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
+            </div>
+            <div class="d-flex justify-content-between">
+              <button type="submit" class="btn btn-primary btn-sm">Save</button>
+              <button type="submit" formaction="/admin/content/home/testimonials/${t.id}/delete" class="btn btn-outline-danger btn-sm">Delete</button>
+            </div>
+          </form>
+        </li>`;
+      });
+      testimonialsHtml += '</ul>';
+    }
+    
     res.render('admin/content-home', {
       title: 'Home Content',
       user: req.user,
@@ -670,7 +709,7 @@ router.get('/content/home', roleRequired(['SUPER_ADMIN', 'EDITOR']), async (req,
       mission,
       vision,
       approach,
-      testimonials,
+      testimonialsHtml,
       message: null,
       error: null,
     });
