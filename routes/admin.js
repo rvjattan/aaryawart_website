@@ -3,7 +3,6 @@ const bcrypt = require('bcrypt');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const XLSX = require('xlsx');
 const { generateToken, authRequired, roleRequired } = require('../middleware/auth');
 const { findByUsername, listAdmins, updateAdminRole, createAdmin, findByEmail, deleteAdmin } = require('../models/adminModel');
 const volunteerModel = require('../models/volunteerModel');
@@ -182,46 +181,67 @@ router.get('/volunteers/export/excel', roleRequired(['SUPER_ADMIN', 'EDITOR']), 
     });
     const volunteers = result.data;
 
-    // Create workbook and worksheet
+    // Create Excel XML format
     const headers = ['ID', 'Name', 'Email', 'Phone', 'Address', 'State', 'City', 'Skills', 'Availability', 'Registered Date'];
-    const rows = volunteers.map(v => [
-      v.id,
-      v.name,
-      v.email,
-      v.phone,
-      v.address || '',
-      v.state || '',
-      v.city || '',
-      v.skills || '',
-      v.availability || '',
-      new Date(v.registered_date).toLocaleDateString(),
-    ]);
+    
+    // Escape XML special characters
+    const escapeXml = (str) => {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;');
+    };
 
-    const workbook = XLSX.utils.book_new();
-    const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-    
-    // Set column widths
-    worksheet['!cols'] = [
-      { wch: 8 },   // ID
-      { wch: 20 },  // Name
-      { wch: 25 },  // Email
-      { wch: 15 },  // Phone
-      { wch: 25 },  // Address
-      { wch: 12 },  // State
-      { wch: 12 },  // City
-      { wch: 20 },  // Skills
-      { wch: 20 },  // Availability
-      { wch: 15 },  // Registered Date
-    ];
+    let excelXml = `<?xml version="1.0"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+ <Worksheet ss:Name="Volunteers">
+  <Table>`;
 
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Volunteers');
-    
-    // Write to buffer
-    const buffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' });
-    
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', 'attachment; filename="volunteers-export.xlsx"');
-    res.send(buffer);
+    // Add header row
+    excelXml += '\n   <Row>';
+    headers.forEach(header => {
+      excelXml += `\n    <Cell><Data ss:Type="String">${escapeXml(header)}</Data></Cell>`;
+    });
+    excelXml += '\n   </Row>';
+
+    // Add data rows
+    volunteers.forEach(v => {
+      excelXml += '\n   <Row>';
+      const rowData = [
+        v.id,
+        v.name,
+        v.email,
+        v.phone,
+        v.address || '',
+        v.state || '',
+        v.city || '',
+        v.skills || '',
+        v.availability || '',
+        new Date(v.registered_date).toLocaleDateString(),
+      ];
+      
+      rowData.forEach(cell => {
+        const isNumber = !isNaN(cell) && cell !== '';
+        const type = isNumber && String(cell).match(/^\d+$/) ? 'Number' : 'String';
+        excelXml += `\n    <Cell><Data ss:Type="${type}">${escapeXml(cell)}</Data></Cell>`;
+      });
+      excelXml += '\n   </Row>';
+    });
+
+    excelXml += `\n  </Table>
+ </Worksheet>
+</Workbook>`;
+
+    res.setHeader('Content-Type', 'application/vnd.ms-excel');
+    res.setHeader('Content-Disposition', 'attachment; filename="volunteers-export.xls"');
+    res.send(excelXml);
   } catch (err) {
     next(err);
   }
