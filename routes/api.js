@@ -40,19 +40,27 @@ function validateVolunteerData(data) {
   }
 
   // Validate email
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!data.email || !emailRegex.test(data.email)) {
-    errors.email = 'Valid email address is required';
+  // Must have characters before @, domain after @, and valid TLD (at least 2 chars after last dot)
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  if (!data.email) {
+    errors.email = 'Email address is required';
+  } else if (data.email !== data.email.trim()) {
+    errors.email = 'Email cannot contain spaces';
+  } else if (!emailRegex.test(data.email)) {
+    errors.email = 'Valid email address is required (example: user@example.com)';
   }
 
   // Validate phone
+  // Must be exactly 10 digits, start with 6, 7, 8, or 9
   const digitsOnly = (data.phone || '').replace(/\D/g, '');
-  if (digitsOnly.length < 10) {
-    errors.phone = 'Mobile number must have at least 10 digits';
+  if (!digitsOnly) {
+    errors.phone = 'Mobile number is required';
+  } else if (digitsOnly.length !== 10) {
+    errors.phone = 'Mobile number must be exactly 10 digits';
   } else {
-    const firstDigit = parseInt(digitsOnly[0]);
-    if (firstDigit <= 5) {
-      errors.phone = 'Mobile number cannot start with 0, 1, 2, 3, 4, or 5';
+    const firstDigit = digitsOnly[0];
+    if (!['6', '7', '8', '9'].includes(firstDigit)) {
+      errors.phone = 'Mobile number must start with 6, 7, 8, or 9';
     }
   }
 
