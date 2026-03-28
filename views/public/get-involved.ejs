@@ -326,20 +326,14 @@
 
     // Initialize state and city autocomplete with custom dropdown
     function initAutocomplete() {
-      console.log('initAutocomplete called');
       const stateInput = document.getElementById('state-input');
       const cityInput = document.getElementById('city-input');
       const stateSuggestionsBox = document.getElementById('state-suggestions');
       const citySuggestionsBox = document.getElementById('city-suggestions');
 
-      console.log('Elements found:', !!stateInput, !!cityInput, !!stateSuggestionsBox, !!citySuggestionsBox);
-
       if (!stateInput || !cityInput || !stateSuggestionsBox || !citySuggestionsBox) {
-        console.error('Required elements not found!');
         return;
       }
-
-      console.log('Starting autocomplete setup...');
 
       // Helper function to create suggestion items
       function createSuggestionItem(text) {
@@ -366,9 +360,7 @@
       // State input handler
       const handleStateInput = () => {
         const value = stateInput.value.trim();
-        console.log('State input:', value);
         const suggestions = value ? getStatesSuggestions(value) : getStates();
-        console.log('Suggestions found:', suggestions.length);
         
         stateSuggestionsBox.innerHTML = '';
         
@@ -377,7 +369,6 @@
           suggestions.slice(0, 10).forEach(state => {
             const item = createSuggestionItem(state);
             item.addEventListener('click', () => {
-              console.log('State selected:', state);
               stateInput.value = state;
               stateSuggestionsBox.style.display = 'none';
               cityInput.value = '';
@@ -395,7 +386,6 @@
       const handleCityInput = () => {
         const state = stateInput.value.trim();
         const value = cityInput.value.trim();
-        console.log('City input for state:', state, 'value:', value);
         
         if (!state) {
           citySuggestionsBox.style.display = 'none';
@@ -403,7 +393,6 @@
         }
         
         const suggestions = getCitiesSuggestions(state, value);
-        console.log('City suggestions found:', suggestions.length);
         
         citySuggestionsBox.innerHTML = '';
         
@@ -412,7 +401,6 @@
           suggestions.slice(0, 10).forEach(city => {
             const item = createSuggestionItem(city);
             item.addEventListener('click', () => {
-              console.log('City selected:', city);
               cityInput.value = city;
               citySuggestionsBox.style.display = 'none';
             });
@@ -426,13 +414,11 @@
       // Attach event listeners
       stateInput.addEventListener('input', handleStateInput);
       stateInput.addEventListener('focus', () => {
-        console.log('State focused');
         handleStateInput();
       });
       
       cityInput.addEventListener('input', handleCityInput);
       cityInput.addEventListener('focus', () => {
-        console.log('City focused');
         if (stateInput.value.trim()) {
           handleCityInput();
         }
@@ -482,17 +468,12 @@
           }
         });
       }
-
-      console.log('Autocomplete initialized successfully');
     }
 
-    // Call init immediately (script is at bottom, DOM is ready)
-    console.log('Script loaded, document.readyState:', document.readyState);
+    // Initialize autocomplete
     if (document.readyState === 'loading') {
-      console.log('DOM still loading, waiting for DOMContentLoaded');
       document.addEventListener('DOMContentLoaded', initAutocomplete);
     } else {
-      console.log('DOM already ready, initializing now');
       initAutocomplete();
     }
 
