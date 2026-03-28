@@ -325,7 +325,7 @@
     };
 
     // Initialize state and city autocomplete with custom dropdown
-    document.addEventListener('DOMContentLoaded', () => {
+    function initAutocomplete() {
       const stateInput = document.getElementById('state-input');
       const cityInput = document.getElementById('city-input');
       const stateSuggestionsBox = document.getElementById('state-suggestions');
@@ -334,6 +334,11 @@
       const phoneInput = document.getElementById('phone-input');
       const emailError = document.getElementById('email-error');
       const phoneError = document.getElementById('phone-error');
+
+      if (!stateInput || !cityInput) {
+        console.error('State or city input not found');
+        return;
+      }
 
       // Helper function to create suggestion items
       function createSuggestionItem(text, isSelected = false) {
@@ -437,32 +442,43 @@
       });
 
       // Real-time email validation
-      emailInput.addEventListener('blur', () => {
-        const email = emailInput.value.trim();
-        if (email && !validators.email(email)) {
-          emailError.textContent = 'Valid email required (example: user@example.com)';
-          emailError.classList.remove('d-none');
-        } else {
-          emailError.classList.add('d-none');
-        }
-      });
+      if (emailInput) {
+        emailInput.addEventListener('blur', () => {
+          const email = emailInput.value.trim();
+          if (email && !validators.email(email)) {
+            emailError.textContent = 'Valid email required (example: user@example.com)';
+            emailError.classList.remove('d-none');
+          } else {
+            emailError.classList.add('d-none');
+          }
+        });
+      }
 
       // Real-time phone validation
-      phoneInput.addEventListener('blur', () => {
-        const phone = phoneInput.value.trim();
-        if (phone && !validators.phone(phone)) {
-          const digitsOnly = phone.replace(/\D/g, '');
-          if (digitsOnly.length !== 10) {
-            phoneError.textContent = 'Must be exactly 10 digits';
+      if (phoneInput) {
+        phoneInput.addEventListener('blur', () => {
+          const phone = phoneInput.value.trim();
+          if (phone && !validators.phone(phone)) {
+            const digitsOnly = phone.replace(/\D/g, '');
+            if (digitsOnly.length !== 10) {
+              phoneError.textContent = 'Must be exactly 10 digits';
+            } else {
+              phoneError.textContent = 'Must start with 6, 7, 8, or 9';
+            }
+            phoneError.classList.remove('d-none');
           } else {
-            phoneError.textContent = 'Must start with 6, 7, 8, or 9';
+            phoneError.classList.add('d-none');
           }
-          phoneError.classList.remove('d-none');
-        } else {
-          phoneError.classList.add('d-none');
-        }
-      });
-    });
+        });
+      }
+    }
+
+    // Call init when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initAutocomplete);
+    } else {
+      initAutocomplete();
+    }
 
     // Form submission with validation
     const form = document.getElementById('volunteer-form');
