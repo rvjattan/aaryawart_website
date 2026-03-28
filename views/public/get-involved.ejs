@@ -148,32 +148,36 @@
               </div>
               <div class="col-md-6 mb-3">
                 <label class="form-label">State <span class="text-danger">*</span></label>
-                <input 
-                  type="text" 
-                  name="state" 
-                  id="state-input"
-                  class="form-control"
-                  list="states-list"
-                  required
-                  autocomplete="off"
-                />
-                <datalist id="states-list"></datalist>
+                <div class="position-relative">
+                  <input 
+                    type="text" 
+                    name="state" 
+                    id="state-input"
+                    class="form-control"
+                    required
+                    autocomplete="off"
+                    placeholder="Start typing to see suggestions..."
+                  />
+                  <div class="position-absolute bg-white border rounded mt-1 w-100" id="state-suggestions" style="display: none; max-height: 200px; overflow-y: auto; z-index: 1000; top: 100%;"></div>
+                </div>
                 <div class="invalid-feedback d-block d-none" id="state-error"></div>
               </div>
             </div>
             <div class="row">
               <div class="col-md-6 mb-3">
                 <label class="form-label">City <span class="text-danger">*</span></label>
-                <input 
-                  type="text" 
-                  name="city" 
-                  id="city-input"
-                  class="form-control"
-                  list="cities-list"
-                  required
-                  autocomplete="off"
-                />
-                <datalist id="cities-list"></datalist>
+                <div class="position-relative">
+                  <input 
+                    type="text" 
+                    name="city" 
+                    id="city-input"
+                    class="form-control"
+                    required
+                    autocomplete="off"
+                    placeholder="Start typing to see suggestions..."
+                  />
+                  <div class="position-absolute bg-white border rounded mt-1 w-100" id="city-suggestions" style="display: none; max-height: 200px; overflow-y: auto; z-index: 1000; top: 100%;"></div>
+                </div>
                 <div class="invalid-feedback d-block d-none" id="city-error"></div>
               </div>
               <div class="col-md-6 mb-3">
@@ -257,16 +261,117 @@
       }
     };
 
-    // Initialize state and city autocomplete
+    // Initialize state and city autocomplete with custom dropdown
     document.addEventListener('DOMContentLoaded', () => {
       const stateInput = document.getElementById('state-input');
       const cityInput = document.getElementById('city-input');
-      const statesList = document.getElementById('states-list');
-      const citiesList = document.getElementById('cities-list');
+      const stateSuggestionsBox = document.getElementById('state-suggestions');
+      const citySuggestionsBox = document.getElementById('city-suggestions');
       const emailInput = document.getElementById('email-input');
       const phoneInput = document.getElementById('phone-input');
       const emailError = document.getElementById('email-error');
       const phoneError = document.getElementById('phone-error');
+
+      // Helper function to create suggestion items
+      function createSuggestionItem(text, isSelected = false) {
+        const div = document.createElement('div');
+        div.className = 'px-3 py-2 cursor-pointer';
+        div.style.cursor = 'pointer';
+        div.style.backgroundColor = isSelected ? '#e7f3ff' : 'white';
+        div.textContent = text;
+        div.setAttribute('data-value', text);
+        
+        div.addEventListener('mouseover', () => {
+          div.style.backgroundColor = '#e7f3ff';
+        });
+        div.addEventListener('mouseout', () => {
+          div.style.backgroundColor = 'white';
+        });
+        
+        return div;
+      }
+
+      // State autocomplete
+      let stateSelectedIndex = -1;
+      stateInput.addEventListener('input', (e) => {
+        const value = e.target.value.trim();
+        const suggestions = value ? getStatesSuggestions(value) : getStates();
+        
+        // Clear previous suggestions
+        stateSuggestionsBox.innerHTML = '';
+        stateSuggestionsBox.style.display = suggestions.length > 0 ? 'block' : 'none';
+        stateSelectedIndex = -1;
+        
+        // Add new suggestions
+        suggestions.slice(0, 10).forEach(state => {
+          const item = createSuggestionItem(state);
+          item.addEventListener('click', () => {
+            stateInput.value = state;
+            stateSuggestionsBox.style.display = 'none';
+            cityInput.focus();
+            cityInput.value = '';
+            // Update city suggestions for the selected state
+            updateCitySuggestions(state, '');
+          });
+          stateSuggestionsBox.appendChild(item);
+        });
+      });
+
+      // City autocomplete
+      let citySelectedIndex = -1;
+      cityInput.addEventListener('input', (e) => {
+        const value = e.target.value.trim();
+        const state = stateInput.value.trim();
+        updateCitySuggestions(state, value);
+      });
+
+      function updateCitySuggestions(state, inputValue) {
+        const suggestions = getCitiesSuggestions(state, inputValue);
+        
+        // Clear previous suggestions
+        citySuggestionsBox.innerHTML = '';
+        citySuggestionsBox.style.display = suggestions.length > 0 ? 'block' : 'none';
+        citySelectedIndex = -1;
+        
+        // Add new suggestions
+        suggestions.slice(0, 10).forEach(city => {
+          const item = createSuggestionItem(city);
+          item.addEventListener('click', () => {
+            cityInput.value = city;
+            citySuggestionsBox.style.display = 'none';
+          });
+          citySuggestionsBox.appendChild(item);
+        });
+      }
+
+      // Close suggestions when clicking outside
+      document.addEventListener('click', (e) => {
+        if (e.target !== stateInput && e.target !== stateSuggestionsBox) {
+          stateSuggestionsBox.style.display = 'none';
+        }
+        if (e.target !== cityInput && e.target !== citySuggestionsBox) {
+          citySuggestionsBox.style.display = 'none';
+        }
+      });
+
+      // Focus to show all suggestions
+      stateInput.addEventListener('focus', () => {
+        if (stateSuggestionsBox.children.length === 0 || stateInput.value === '') {
+          stateInput.dispatchEvent(new Event('input'));
+        } else {
+          stateSuggestionsBox.style.display = 'block';
+        }
+      });
+
+      cityInput.addEventListener('focus', () => {
+        if (stateInput.value) {
+          if (citySuggestionsBox.children.length === 0 || cityInput.value === '') {
+            cityInput.dispatchEvent(new Event('input'));
+          } else {
+            citySuggestionsBox.style.display = 'block';
+          }
+        }
+      });
 
       // Real-time email validation
       emailInput.addEventListener('blur', () => {
@@ -294,42 +399,6 @@
           phoneError.classList.add('d-none');
         }
       });
-
-      // Populate initial state suggestions
-      function updateStatesSuggestions(value) {
-        if (typeof getStatesSuggestions !== 'function') return;
-        const suggestions = getStatesSuggestions(value);
-        statesList.innerHTML = suggestions.map(s => `<option value="${s}">`).join('');
-      }
-
-      // Populate city suggestions based on selected state
-      function updateCitiesSuggestions() {
-        if (typeof getCitiesSuggestions !== 'function') return;
-        const selectedState = stateInput.value;
-        const cityValue = cityInput.value;
-        const suggestions = getCitiesSuggestions(selectedState, cityValue);
-        citiesList.innerHTML = suggestions.map(c => `<option value="${c}">`).join('');
-      }
-
-      // State input listeners
-      stateInput.addEventListener('input', (e) => {
-        updateStatesSuggestions(e.target.value);
-      });
-
-      stateInput.addEventListener('change', (e) => {
-        updateStatesSuggestions(e.target.value);
-        // Reset city when state changes
-        cityInput.value = '';
-        updateCitiesSuggestions();
-      });
-
-      // City input listeners
-      cityInput.addEventListener('input', (e) => {
-        updateCitiesSuggestions();
-      });
-
-      // Initialize with all states on first load
-      updateStatesSuggestions('');
     });
 
     // Form submission with validation
