@@ -76,7 +76,7 @@ app.use(async (req, res, next) => {
         {
           id: 'twitter',
           icon: 'bi-twitter-x',
-          url: 'https://x.com/aaryawartastro',
+          url: 'https://twitter.com/seva_nyaas',
         },
         {
           id: 'instagram',
