@@ -25,6 +25,7 @@
           <td>
             <div class="d-flex gap-1">
               <form method="post" action="/admin/users/${a.id}/role" class="d-flex gap-1">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
                 <select name="role" class="form-select form-select-sm">
                   <option value="SUPER_ADMIN" ${a.role === 'SUPER_ADMIN' ? 'selected' : ''}>Super Admin</option>
                   <option value="EDITOR" ${a.role === 'EDITOR' ? 'selected' : ''}>Editor</option>
@@ -33,6 +34,7 @@
                 <button class="btn btn-sm btn-outline-primary">Update</button>
               </form>
               <form method="post" action="/admin/users/${a.id}/delete" class="form-inline-display" onsubmit="return confirm('Are you sure you want to delete this admin?');">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
                 <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
               </form>
             </div>

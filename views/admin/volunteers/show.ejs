@@ -30,6 +30,7 @@
   </dl>
 
   <form method="post" action="/admin/volunteers/${volunteer.id}/delete" onsubmit="return confirm('Delete this volunteer?');">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
     <button class="btn btn-danger">Delete</button>
     <a href="/admin/volunteers" class="btn btn-secondary">Back</a>
   </form>

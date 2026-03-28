@@ -3,6 +3,7 @@
   ${message ? `<div class="alert alert-success">${message}</div>` : ''}
   ${error ? `<div class="alert alert-danger">${error}</div>` : ''}
   <form method="post">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
     <div class="mb-3">
       <label class="form-label">Filter by State (optional)</label>
       <input type="text" name="state" class="form-control" placeholder="State" />

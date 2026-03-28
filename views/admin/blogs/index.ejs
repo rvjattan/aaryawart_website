@@ -43,6 +43,7 @@
           <td class="text-end">
             <a href="/admin/blogs/${b.id}/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
             <form method="post" action="/admin/blogs/${b.id}/delete" class="form-inline-display" onsubmit="return confirm('Delete this blog post?');">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
               <button class="btn btn-sm btn-outline-danger">Delete</button>
             </form>
           </td>

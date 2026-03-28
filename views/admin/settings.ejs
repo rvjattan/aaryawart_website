@@ -6,6 +6,7 @@
       ${error ? `<div class="alert alert-danger">${error}</div>` : ''}
 
       <form method="post" action="/admin/settings">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
         <!-- Site Identity Section -->
         <div class="card mb-4">
           <div class="card-header bg-primary text-white">
