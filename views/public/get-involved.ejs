@@ -326,93 +326,119 @@
 
     // Initialize state and city autocomplete with custom dropdown
     function initAutocomplete() {
+      console.log('initAutocomplete called');
       const stateInput = document.getElementById('state-input');
       const cityInput = document.getElementById('city-input');
       const stateSuggestionsBox = document.getElementById('state-suggestions');
       const citySuggestionsBox = document.getElementById('city-suggestions');
-      const emailInput = document.getElementById('email-input');
-      const phoneInput = document.getElementById('phone-input');
-      const emailError = document.getElementById('email-error');
-      const phoneError = document.getElementById('phone-error');
 
-      if (!stateInput || !cityInput) {
-        console.error('State or city input not found');
+      console.log('Elements found:', !!stateInput, !!cityInput, !!stateSuggestionsBox, !!citySuggestionsBox);
+
+      if (!stateInput || !cityInput || !stateSuggestionsBox || !citySuggestionsBox) {
+        console.error('Required elements not found!');
         return;
       }
 
+      console.log('Starting autocomplete setup...');
+
       // Helper function to create suggestion items
-      function createSuggestionItem(text, isSelected = false) {
+      function createSuggestionItem(text) {
         const div = document.createElement('div');
         div.className = 'px-3 py-2 cursor-pointer';
         div.style.cursor = 'pointer';
-        div.style.backgroundColor = isSelected ? '#e7f3ff' : 'white';
+        div.style.padding = '8px 12px';
+        div.style.borderBottom = '1px solid #eee';
         div.textContent = text;
-        div.setAttribute('data-value', text);
         
         div.addEventListener('mouseover', () => {
-          div.style.backgroundColor = '#e7f3ff';
+          div.style.backgroundColor = '#f0f0f0';
         });
         div.addEventListener('mouseout', () => {
           div.style.backgroundColor = 'white';
+        });
+        div.addEventListener('click', (e) => {
+          e.stopPropagation();
         });
         
         return div;
       }
 
-      // State autocomplete
-      let stateSelectedIndex = -1;
-      stateInput.addEventListener('input', (e) => {
-        const value = e.target.value.trim();
+      // State input handler
+      const handleStateInput = () => {
+        const value = stateInput.value.trim();
+        console.log('State input:', value);
         const suggestions = value ? getStatesSuggestions(value) : getStates();
+        console.log('Suggestions found:', suggestions.length);
         
-        // Clear previous suggestions
         stateSuggestionsBox.innerHTML = '';
-        stateSuggestionsBox.style.display = suggestions.length > 0 ? 'block' : 'none';
-        stateSelectedIndex = -1;
         
-        // Add new suggestions
-        suggestions.slice(0, 10).forEach(state => {
-          const item = createSuggestionItem(state);
-          item.addEventListener('click', () => {
-            stateInput.value = state;
-            stateSuggestionsBox.style.display = 'none';
-            cityInput.focus();
-            cityInput.value = '';
-            // Update city suggestions for the selected state
-            updateCitySuggestions(state, '');
+        if (suggestions.length > 0) {
+          stateSuggestionsBox.style.display = 'block';
+          suggestions.slice(0, 10).forEach(state => {
+            const item = createSuggestionItem(state);
+            item.addEventListener('click', () => {
+              console.log('State selected:', state);
+              stateInput.value = state;
+              stateSuggestionsBox.style.display = 'none';
+              cityInput.value = '';
+              citySuggestionsBox.innerHTML = '';
+              cityInput.focus();
+            });
+            stateSuggestionsBox.appendChild(item);
           });
-          stateSuggestionsBox.appendChild(item);
-        });
-      });
+        } else {
+          stateSuggestionsBox.style.display = 'none';
+        }
+      };
 
-      // City autocomplete
-      let citySelectedIndex = -1;
-      cityInput.addEventListener('input', (e) => {
-        const value = e.target.value.trim();
+      // City input handler  
+      const handleCityInput = () => {
         const state = stateInput.value.trim();
-        updateCitySuggestions(state, value);
+        const value = cityInput.value.trim();
+        console.log('City input for state:', state, 'value:', value);
+        
+        if (!state) {
+          citySuggestionsBox.style.display = 'none';
+          return;
+        }
+        
+        const suggestions = getCitiesSuggestions(state, value);
+        console.log('City suggestions found:', suggestions.length);
+        
+        citySuggestionsBox.innerHTML = '';
+        
+        if (suggestions.length > 0) {
+          citySuggestionsBox.style.display = 'block';
+          suggestions.slice(0, 10).forEach(city => {
+            const item = createSuggestionItem(city);
+            item.addEventListener('click', () => {
+              console.log('City selected:', city);
+              cityInput.value = city;
+              citySuggestionsBox.style.display = 'none';
+            });
+            citySuggestionsBox.appendChild(item);
+          });
+        } else {
+          citySuggestionsBox.style.display = 'none';
+        }
+      };
+
+      // Attach event listeners
+      stateInput.addEventListener('input', handleStateInput);
+      stateInput.addEventListener('focus', () => {
+        console.log('State focused');
+        handleStateInput();
+      });
+      
+      cityInput.addEventListener('input', handleCityInput);
+      cityInput.addEventListener('focus', () => {
+        console.log('City focused');
+        if (stateInput.value.trim()) {
+          handleCityInput();
+        }
       });
 
-      function updateCitySuggestions(state, inputValue) {
-        const suggestions = getCitiesSuggestions(state, inputValue);
-        
-        // Clear previous suggestions
-        citySuggestionsBox.innerHTML = '';
-        citySuggestionsBox.style.display = suggestions.length > 0 ? 'block' : 'none';
-        citySelectedIndex = -1;
-        
-        // Add new suggestions
-        suggestions.slice(0, 10).forEach(city => {
-          const item = createSuggestionItem(city);
-          item.addEventListener('click', () => {
-            cityInput.value = city;
-            citySuggestionsBox.style.display = 'none';
-          });
-          citySuggestionsBox.appendChild(item);
-        });
-      }
-
-      // Close suggestions when clicking outside
+      // Close suggestions when clicking elsewhere
       document.addEventListener('click', (e) => {
         if (e.target !== stateInput && !stateSuggestionsBox.contains(e.target)) {
           stateSuggestionsBox.style.display = 'none';
@@ -422,27 +448,10 @@
         }
       });
 
-      // Focus to show all suggestions
-      stateInput.addEventListener('focus', () => {
-        if (stateSuggestionsBox.children.length === 0 || stateInput.value === '') {
-          stateInput.dispatchEvent(new Event('input'));
-        } else {
-          stateSuggestionsBox.style.display = 'block';
-        }
-      });
-
-      cityInput.addEventListener('focus', () => {
-        if (stateInput.value) {
-          if (citySuggestionsBox.children.length === 0 || cityInput.value === '') {
-            cityInput.dispatchEvent(new Event('input'));
-          } else {
-            citySuggestionsBox.style.display = 'block';
-          }
-        }
-      });
-
-      // Real-time email validation
-      if (emailInput) {
+      // Email validation
+      const emailInput = document.getElementById('email-input');
+      const emailError = document.getElementById('email-error');
+      if (emailInput && emailError) {
         emailInput.addEventListener('blur', () => {
           const email = emailInput.value.trim();
           if (email && !validators.email(email)) {
@@ -454,8 +463,10 @@
         });
       }
 
-      // Real-time phone validation
-      if (phoneInput) {
+      // Phone validation
+      const phoneInput = document.getElementById('phone-input');
+      const phoneError = document.getElementById('phone-error');
+      if (phoneInput && phoneError) {
         phoneInput.addEventListener('blur', () => {
           const phone = phoneInput.value.trim();
           if (phone && !validators.phone(phone)) {
@@ -471,12 +482,17 @@
           }
         });
       }
+
+      console.log('Autocomplete initialized successfully');
     }
 
-    // Call init when DOM is ready
+    // Call init immediately (script is at bottom, DOM is ready)
+    console.log('Script loaded, document.readyState:', document.readyState);
     if (document.readyState === 'loading') {
+      console.log('DOM still loading, waiting for DOMContentLoaded');
       document.addEventListener('DOMContentLoaded', initAutocomplete);
     } else {
+      console.log('DOM already ready, initializing now');
       initAutocomplete();
     }
 
