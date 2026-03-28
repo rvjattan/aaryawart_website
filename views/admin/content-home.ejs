@@ -5,18 +5,18 @@
         <div class="card-header">Hero Section</div>
         <div class="card-body">
           <form method="post" action="/admin/content/home/section/hero">
-            <input type="hidden" name="id" value="<%= hero && hero.id || '' %>" />
+            <input type="hidden" name="id" value="${hero && hero.id || ''}" />
             <div class="mb-3">
               <label class="form-label">Title</label>
-              <input type="text" name="title" class="form-control" value="<%= hero && hero.title || '' %>" />
+              <input type="text" name="title" class="form-control" value="${hero && hero.title || ''}" />
             </div>
             <div class="mb-3">
               <label class="form-label">Subheading</label>
-              <textarea name="body" class="form-control" rows="3"><%= hero && hero.body || '' %></textarea>
+              <textarea name="body" class="form-control" rows="3">${hero && hero.body || ''}</textarea>
             </div>
             <div class="mb-3">
               <label class="form-label">Extra JSON (backgroundImage, buttons)</label>
-              <textarea name="extra_json" class="form-control" rows="3"><%= hero && hero.extra_json || '' %></textarea>
+              <textarea name="extra_json" class="form-control" rows="3">${hero && hero.extra_json || ''}</textarea>
               <div class="form-text">Example: {"backgroundImage":"/static/images/hero.jpg","buttons":[{"label":"Join Us","url":"/get-involved","variant":"light"}]}</div>
             </div>
             <button type="submit" class="btn btn-primary btn-sm">Save Hero</button>
@@ -28,43 +28,43 @@
         <div class="card-header">Mission / Vision / Approach</div>
         <div class="card-body">
           <form method="post" action="/admin/content/home/section/mission" class="mb-3">
-            <input type="hidden" name="id" value="<%= mission && mission.id || '' %>" />
+            <input type="hidden" name="id" value="${mission && mission.id || ''}" />
             <h6>Mission</h6>
             <div class="mb-2">
               <label class="form-label">Title</label>
-              <input type="text" name="title" class="form-control" value="<%= mission && mission.title || '' %>" />
+              <input type="text" name="title" class="form-control" value="${mission && mission.title || ''}" />
             </div>
             <div class="mb-3">
               <label class="form-label">Body</label>
-              <textarea name="body" class="form-control" rows="2"><%= mission && mission.body || '' %></textarea>
+              <textarea name="body" class="form-control" rows="2">${mission && mission.body || ''}</textarea>
             </div>
             <button type="submit" class="btn btn-outline-primary btn-sm">Save Mission</button>
           </form>
 
           <form method="post" action="/admin/content/home/section/vision" class="mb-3">
-            <input type="hidden" name="id" value="<%= vision && vision.id || '' %>" />
+            <input type="hidden" name="id" value="${vision && vision.id || ''}" />
             <h6>Vision</h6>
             <div class="mb-2">
               <label class="form-label">Title</label>
-              <input type="text" name="title" class="form-control" value="<%= vision && vision.title || '' %>" />
+              <input type="text" name="title" class="form-control" value="${vision && vision.title || ''}" />
             </div>
             <div class="mb-3">
               <label class="form-label">Body</label>
-              <textarea name="body" class="form-control" rows="2"><%= vision && vision.body || '' %></textarea>
+              <textarea name="body" class="form-control" rows="2">${vision && vision.body || ''}</textarea>
             </div>
             <button type="submit" class="btn btn-outline-primary btn-sm">Save Vision</button>
           </form>
 
           <form method="post" action="/admin/content/home/section/approach">
-            <input type="hidden" name="id" value="<%= approach && approach.id || '' %>" />
+            <input type="hidden" name="id" value="${approach && approach.id || ''}" />
             <h6>Approach</h6>
             <div class="mb-2">
               <label class="form-label">Title</label>
-              <input type="text" name="title" class="form-control" value="<%= approach && approach.title || '' %>" />
+              <input type="text" name="title" class="form-control" value="${approach && approach.title || ''}" />
             </div>
             <div class="mb-3">
               <label class="form-label">Body</label>
-              <textarea name="body" class="form-control" rows="2"><%= approach && approach.body || '' %></textarea>
+              <textarea name="body" class="form-control" rows="2">${approach && approach.body || ''}</textarea>
             </div>
             <button type="submit" class="btn btn-outline-primary btn-sm">Save Approach</button>
           </form>
@@ -84,36 +84,43 @@
           </form>
         </div>
         <div class="card-body">
-          <% if (!testimonials || !testimonials.length) { %>
+          ${!testimonials || !testimonials.length ? `
             <p class="text-muted small">No testimonials yet. Add one using the button above.</p>
-          <% } else { %>
+          ` : `
             <ul class="list-group">
-              <% testimonials.forEach(function(t) { %>
-                <% let extra = {}; try { extra = t.extra_json ? JSON.parse(t.extra_json) : {}; } catch (e) { extra = {}; } %>
+              ${testimonials.map(function(t) {
+                let extra = {}; 
+                try { 
+                  extra = t.extra_json ? JSON.parse(t.extra_json) : {}; 
+                } catch (e) { 
+                  extra = {}; 
+                }
+                return \`
                 <li class="list-group-item">
                   <form method="post" action="/admin/content/home/section/testimonials">
-                    <input type="hidden" name="id" value="<%= t.id %>" />
+                    <input type="hidden" name="id" value="\${t.id}" />
                     <div class="mb-1">
                       <label class="form-label small mb-0">Quote</label>
-                      <textarea name="body" class="form-control form-control-sm" rows="2"><%= t.body || '' %></textarea>
+                      <textarea name="body" class="form-control form-control-sm" rows="2">\${t.body || ''}</textarea>
                     </div>
                     <div class="mb-1">
                       <label class="form-label small mb-0">Attribution (name / role)</label>
-                      <input type="text" name="title" class="form-control form-control-sm" value="<%= extra.attribution || t.title || '' %>" />
+                      <input type="text" name="title" class="form-control form-control-sm" value="\${extra.attribution || t.title || ''}" />
                     </div>
                     <div class="mb-2">
                       <label class="form-label small mb-0">Extra JSON (optional)</label>
-                      <textarea name="extra_json" class="form-control form-control-sm" rows="2"><%= t.extra_json || '' %></textarea>
+                      <textarea name="extra_json" class="form-control form-control-sm" rows="2">\${t.extra_json || ''}</textarea>
                     </div>
                     <div class="d-flex justify-content-between">
                       <button type="submit" class="btn btn-primary btn-sm">Save</button>
-                      <button type="submit" formaction="/admin/content/home/testimonials/<%= t.id %>/delete" class="btn btn-outline-danger btn-sm">Delete</button>
+                      <button type="submit" formaction="/admin/content/home/testimonials/\${t.id}/delete" class="btn btn-outline-danger btn-sm">Delete</button>
                     </div>
                   </form>
                 </li>
-              <% }); %>
+                \`;
+              }).join('')}
             </ul>
-          <% } %>
+          `}
         </div>
       </div>
     </div>
