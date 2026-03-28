@@ -36,8 +36,10 @@ async function getVolunteers({ page = 1, limit = 20, state, city, search }) {
     params.push(city);
   }
   if (search) {
+    // ✅ Escape SQL wildcard characters to prevent injection
+    const escapedSearch = String(search).replace(/[%_\\]/g, '\\$&');
     filters.push('(name LIKE ? OR email LIKE ?)');
-    params.push(`%${search}%`, `%${search}%`);
+    params.push(`%${escapedSearch}%`, `%${escapedSearch}%`);
   }
 
   const whereClause = filters.length ? `WHERE ${filters.join(' AND ')}` : '';
@@ -66,11 +68,15 @@ async function getVolunteerById(id) {
 }
 
 async function updateVolunteer(id, data) {
+  // ✅ Whitelist of allowed updatable fields to prevent object injection
+  const ALLOWED_FIELDS = ['name', 'email', 'phone', 'address', 'state', 'city', 'skills', 'availability'];
+  
   const fields = [];
   const params = [];
 
+  // Only allow updating whitelisted fields
   Object.entries(data).forEach(([key, value]) => {
-    if (value !== undefined) {
+    if (ALLOWED_FIELDS.includes(key) && value !== undefined) {
       fields.push(`${key} = ?`);
       params.push(value);
     }

@@ -73,8 +73,13 @@ async function updateBlock(id, { title, body, extra_json, sort_order }) {
     params.push(extra_json);
   }
   if (sort_order !== undefined) {
+    // ✅ Validate sort_order is a positive integer to prevent injection
+    const sortOrderNum = parseInt(sort_order);
+    if (isNaN(sortOrderNum) || sortOrderNum < 0) {
+      throw new Error('Invalid sort_order value');
+    }
     fields.push('sort_order = ?');
-    params.push(sort_order);
+    params.push(sortOrderNum);
   }
   if (!fields.length) return;
   params.push(id);

@@ -6,6 +6,7 @@ const { getBlogs, getBlogById } = require('../models/blogModel');
 const statsModel = require('../models/statsModel');
 const donationModel = require('../models/donationModel');
 const testimonialModel = require('../models/testimonialModel');
+const { volunteerLimiter, testimonialLimiter, donationLimiter } = require('../middleware/rateLimiter');
 const nodemailer = require('nodemailer');
 
 const Razorpay = require('razorpay');
@@ -34,16 +35,20 @@ function createTransporter() {
 function validateVolunteerData(data) {
   const errors = {};
 
-  // Validate name
+  // Validate name (max 100 chars)
   if (!data.name || !data.name.trim()) {
     errors.name = 'Name is required';
+  } else if (data.name.length > 100) {
+    errors.name = 'Name must be 100 characters or less';
   }
 
-  // Validate email
+  // Validate email (max 254 chars per RFC 5321)
   // Must have characters before @, domain after @, and valid TLD (at least 2 chars after last dot)
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
   if (!data.email) {
     errors.email = 'Email address is required';
+  } else if (data.email.length > 254) {
+    errors.email = 'Email address is too long';
   } else if (data.email !== data.email.trim()) {
     errors.email = 'Email cannot contain spaces';
   } else if (!emailRegex.test(data.email)) {
@@ -64,21 +69,25 @@ function validateVolunteerData(data) {
     }
   }
 
-  // Validate state
+  // Validate state (max 50 chars)
   if (!data.state || !data.state.trim()) {
     errors.state = 'State is required';
+  } else if (data.state.length > 50) {
+    errors.state = 'State must be 50 characters or less';
   }
 
-  // Validate city
+  // Validate city (max 50 chars)
   if (!data.city || !data.city.trim()) {
     errors.city = 'City is required';
+  } else if (data.city.length > 50) {
+    errors.city = 'City must be 50 characters or less';
   }
 
   return errors;
 }
 
 // Public API: create volunteer (from Get Involved form)
-router.post('/volunteers', async (req, res, next) => {
+router.post('/volunteers', volunteerLimiter, async (req, res, next) => {
   try {
     // Validate input data
     const validationErrors = validateVolunteerData(req.body);
@@ -169,7 +178,7 @@ router.get('/stats', async (req, res, next) => {
 // --- Donations (Razorpay) ---
 
 // Create Razorpay order for donation
-router.post('/donate/create-order', async (req, res, next) => {
+router.post('/donate/create-order', donationLimiter, async (req, res, next) => {
   try {
     const instance = getRazorpayInstance();
     if (!instance) {
@@ -255,13 +264,26 @@ router.post('/donate/verify', async (req, res, next) => {
 });
 
 // Public API: submit testimonial
-router.post('/testimonials', async (req, res, next) => {
+router.post('/testimonials', testimonialLimiter, async (req, res, next) => {
   try {
     const { name, email, message } = req.body;
     
     // Validation
     if (!name || !email || !message) {
       return res.status(400).json({ success: false, message: 'Name, email, and message are required.' });
+    }
+    
+    // Length validation
+    if (name.length > 100) {
+      return res.status(400).json({ success: false, message: 'Name must be 100 characters or less.' });
+    }
+    
+    if (email.length > 254) {
+      return res.status(400).json({ success: false, message: 'Email address is too long.' });
+    }
+    
+    if (message.length > 2000) {
+      return res.status(400).json({ success: false, message: 'Message must be 2000 characters or less.' });
     }
     
     // Basic email validation

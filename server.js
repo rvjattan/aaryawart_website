@@ -10,6 +10,7 @@ require('dotenv').config();
 
 const apiRoutes = require('./routes/api');
 const adminRoutes = require('./routes/admin');
+const { csrfProtection, csrfTokenMiddleware } = require('./middleware/csrf');
 const blogModel = require('./models/blogModel');
 const statsModel = require('./models/statsModel');
 const siteSettingsModel = require('./models/siteSettingsModel');
@@ -26,7 +27,7 @@ app.use('/static', express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Security & logging
-// Configure CSP to allow Bootstrap and Bootstrap Icons from jsdelivr CDN
+// ✅ Configure comprehensive security headers
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -38,14 +39,22 @@ app.use(helmet({
       connectSrc: ["'self'", "https://cdn.jsdelivr.net"],
     },
   },
+  frameguard: { action: 'deny' }, // ✅ Prevent clickjacking
+  xssFilter: true, // ✅ Enable XSS filter
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' }, // ✅ Control referer headers
+  hsts: {
+    maxAge: 31536000, // ✅ 1 year HSTS
+    includeSubDomains: true,
+    preload: true,
+  },
 }));
 app.use(morgan('dev'));
 
 // Parsers
 app.use(cors());
 app.use(cookieParser());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true, limit: '25kb' }));
+app.use(bodyParser.json({ limit: '50kb' }));
 
 // Global site settings (header, footer, ticker) available to all views
 app.use(async (req, res, next) => {
@@ -92,6 +101,18 @@ app.use(async (req, res, next) => {
       ]),
     };
     res.locals.settings = await siteSettingsModel.getSettings(defaults);
+    
+    // ✅ Global HTML escaping helper for all views to prevent XSS
+    res.locals.escapeHtml = (str) => {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#x27;')
+        .replace(/\//g, '&#x2F;');
+    };
   } catch (e) {
     res.locals.settings = null;
   }
@@ -195,6 +216,9 @@ app.get('/testimonials', (req, res) => {
 // API routes
 app.use('/api', apiRoutes);
 
+// CSRF protection for admin routes
+app.use('/admin', csrfProtection, csrfTokenMiddleware);
+
 // Admin routes
 app.use('/admin', adminRoutes);
 
@@ -208,9 +232,25 @@ app.use((req, res, next) => {
 
 // Error handler
 app.use((err, req, res, next) => {
-  console.error(err);
+  // ✅ Don't log sensitive information in production
+  if (process.env.NODE_ENV === 'production') {
+    console.error('[Error]', err.message);
+  } else {
+    console.error('[Error]', err); // Full stack trace only in development
+  }
+  
+  // ✅ CSRF token validation errors
+  if (err.code === 'EBADCSRFTOKEN') {
+    return res.status(403).json({ success: false, message: 'Invalid security token' });
+  }
+  
   if (req.path.startsWith('/api/')) {
-    res.status(500).json({ success: false, message: 'Internal server error' });
+    // ✅ Don't expose error details in API responses
+    const status = err.status || err.statusCode || 500;
+    const message = process.env.NODE_ENV === 'production' 
+      ? 'Internal server error' 
+      : err.message;
+    res.status(status).json({ success: false, message });
   } else {
     res.status(500).render('public/500', { title: 'Server Error' });
   }

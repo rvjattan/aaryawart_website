@@ -22,11 +22,15 @@ async function createBlog(post) {
 }
 
 async function updateBlog(id, post) {
+  // ✅ Whitelist of allowed updatable fields to prevent object/field injection
+  const ALLOWED_FIELDS = ['title', 'featured_image', 'category', 'content', 'author', 'publish_date', 'status'];
+  
   const fields = [];
   const params = [];
 
+  // Only allow updating whitelisted fields
   Object.entries(post).forEach(([key, value]) => {
-    if (value !== undefined) {
+    if (ALLOWED_FIELDS.includes(key) && value !== undefined) {
       fields.push(`${key} = ?`);
       params.push(value);
     }
@@ -61,8 +65,10 @@ async function getBlogs({ page = 1, limit = 10, status = 'PUBLISHED', category, 
     params.push(category);
   }
   if (search) {
+    // ✅ Escape SQL wildcard characters to prevent injection
+    const escapedSearch = String(search).replace(/[%_\\]/g, '\\$&');
     filters.push('title LIKE ?');
-    params.push(`%${search}%`);
+    params.push(`%${escapedSearch}%`);
   }
 
   const whereClause = filters.length ? `WHERE ${filters.join(' AND ')}` : '';
