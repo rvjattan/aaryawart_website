@@ -216,12 +216,6 @@ app.get('/testimonials', (req, res) => {
 // API routes
 app.use('/api', apiRoutes);
 
-const csrf = require('csurf');
-const csrfProtection = csrf({ cookie: true });
-const csrfTokenMiddleware = (req, res, next) => {
-  res.locals.csrfToken = req.csrfToken();
-  next();
-};
 
 // CSRF protection for admin routes
 app.use('/admin', csrfProtection, csrfTokenMiddleware);
