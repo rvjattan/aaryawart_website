@@ -5,7 +5,7 @@
         <div class="card-header">Hero Section</div>
         <div class="card-body">
           <form method="post" action="/admin/content/home/section/hero">
-            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+            <input type="hidden" name="_csrf" value="${csrfToken}" />
             <input type="hidden" name="id" value="${hero && hero.id || ''}" />
             <div class="mb-3">
               <label class="form-label">Title</label>
@@ -29,7 +29,7 @@
         <div class="card-header">Mission / Vision / Approach</div>
         <div class="card-body">
           <form method="post" action="/admin/content/home/section/mission" class="mb-3">
-            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+            <input type="hidden" name="_csrf" value="${csrfToken}" />
             <input type="hidden" name="id" value="${mission && mission.id || ''}" />
             <h6>Mission</h6>
             <div class="mb-2">
@@ -44,7 +44,7 @@
           </form>
 
           <form method="post" action="/admin/content/home/section/vision" class="mb-3">
-            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+            <input type="hidden" name="_csrf" value="${csrfToken}" />
             <input type="hidden" name="id" value="${vision && vision.id || ''}" />
             <h6>Vision</h6>
             <div class="mb-2">
@@ -59,7 +59,7 @@
           </form>
 
           <form method="post" action="/admin/content/home/section/approach">
-            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+            <input type="hidden" name="_csrf" value="${csrfToken}" />
             <input type="hidden" name="id" value="${approach && approach.id || ''}" />
             <h6>Approach</h6>
             <div class="mb-2">
@@ -81,7 +81,7 @@
         <div class="card-header d-flex justify-content-between align-items-center">
           <span>Testimonials</span>
           <form method="post" action="/admin/content/home/section/testimonials">
-            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+            <input type="hidden" name="_csrf" value="${csrfToken}" />
             <input type="hidden" name="id" value="" />
             <input type="hidden" name="title" value="" />
             <input type="hidden" name="body" value="New testimonial..." />

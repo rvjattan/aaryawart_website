@@ -82,18 +82,18 @@
                 <td style="white-space: nowrap;">
                   <% if (!t.is_approved) { %>
                     <form method="post" action="/admin/testimonials/<%= t.id %>/approve<%= filters.status ? '?status=' + filters.status : '' %>" style="display: inline;">
-                      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                      <input type="hidden" name="_csrf" value="${csrfToken}" />
                       <button type="submit" class="btn btn-sm btn-success">Approve</button>
                     </form>
                   <% } %>
                   <% if (t.is_approved) { %>
                     <form method="post" action="/admin/testimonials/<%= t.id %>/reject<%= filters.status ? '?status=' + filters.status : '' %>" style="display: inline;">
-                      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                      <input type="hidden" name="_csrf" value="${csrfToken}" />
                       <button type="submit" class="btn btn-sm btn-warning">Reject</button>
                     </form>
                   <% } %>
                   <form method="post" action="/admin/testimonials/<%= t.id %>/delete<%= filters.status ? '?status=' + filters.status : '' %>" style="display: inline;" onsubmit="return confirm('Are you sure?');">
-                    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                    <input type="hidden" name="_csrf" value="${csrfToken}" />
                     <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                   </form>
                 </td>

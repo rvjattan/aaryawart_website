@@ -4,7 +4,7 @@
       <h3>${mode === 'create' ? 'Create New Admin' : 'Edit Admin'}</h3>
       ${error ? '<div class="alert alert-danger">' + error + '</div>' : ''}
       <form method="post" action="/admin/users" class="mt-3">
-        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+        <input type="hidden" name="_csrf" value="${csrfToken}" />
         <div class="mb-3">
           <label class="form-label">Username</label>
           <input 
