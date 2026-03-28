@@ -201,11 +201,10 @@
         <h2 class="mb-3">Testimonials</h2>
         <% if (testimonials && testimonials.length) { %>
           <% testimonials.forEach(function(t) { %>
-            <% var tExtra = {}; try { tExtra = t.extra_json ? JSON.parse(t.extra_json) : {}; } catch (e) { tExtra = {}; } %>
             <div class="testimonial mb-3">
-              <p><%= t.body || '' %></p>
-              <% if (t.title || tExtra.attribution) { %>
-                <small class="text-muted">-- <%= tExtra.attribution || t.title %></small>
+              <p><%= t.message || t.body || '' %></p>
+              <% if (t.name || t.title) { %>
+                <small class="text-muted">-- <%= t.name || t.title %></small>
               <% } %>
             </div>
           <% }); %>

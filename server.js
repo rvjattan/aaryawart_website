@@ -15,6 +15,7 @@ const blogModel = require('./models/blogModel');
 const statsModel = require('./models/statsModel');
 const siteSettingsModel = require('./models/siteSettingsModel');
 const contentModel = require('./models/contentModel');
+const testimonialModel = require('./models/testimonialModel');
 
 const app = express();
 
@@ -145,7 +146,7 @@ app.get('/', async (req, res, next) => {
       contentModel.getBlocks('home', 'mission'),
       contentModel.getBlocks('home', 'vision'),
       contentModel.getBlocks('home', 'approach'),
-      contentModel.getBlocks('home', 'testimonials'),
+      testimonialModel.getApprovedTestimonials(),
     ]);
 
     const getValue = (result, fallback) =>
