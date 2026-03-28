@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const XLSX = require('xlsx');
 const { generateToken, authRequired, roleRequired } = require('../middleware/auth');
 const { findByUsername, listAdmins, updateAdminRole, createAdmin, findByEmail, deleteAdmin } = require('../models/adminModel');
 const volunteerModel = require('../models/volunteerModel');
@@ -163,6 +164,64 @@ router.get('/volunteers/export/csv', roleRequired(['SUPER_ADMIN', 'EDITOR']), as
     res.setHeader('Content-Type', 'text/csv');
     res.setHeader('Content-Disposition', 'attachment; filename="volunteers-export.csv"');
     res.send(csv);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Export volunteers to Excel
+router.get('/volunteers/export/excel', roleRequired(['SUPER_ADMIN', 'EDITOR']), async (req, res, next) => {
+  try {
+    const { state, city, search } = req.query;
+    const result = await volunteerModel.getVolunteers({
+      page: 1,
+      limit: 10000,
+      state,
+      city,
+      search,
+    });
+    const volunteers = result.data;
+
+    // Create workbook and worksheet
+    const headers = ['ID', 'Name', 'Email', 'Phone', 'Address', 'State', 'City', 'Skills', 'Availability', 'Registered Date'];
+    const rows = volunteers.map(v => [
+      v.id,
+      v.name,
+      v.email,
+      v.phone,
+      v.address || '',
+      v.state || '',
+      v.city || '',
+      v.skills || '',
+      v.availability || '',
+      new Date(v.registered_date).toLocaleDateString(),
+    ]);
+
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+    
+    // Set column widths
+    worksheet['!cols'] = [
+      { wch: 8 },   // ID
+      { wch: 20 },  // Name
+      { wch: 25 },  // Email
+      { wch: 15 },  // Phone
+      { wch: 25 },  // Address
+      { wch: 12 },  // State
+      { wch: 12 },  // City
+      { wch: 20 },  // Skills
+      { wch: 20 },  // Availability
+      { wch: 15 },  // Registered Date
+    ];
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Volunteers');
+    
+    // Write to buffer
+    const buffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' });
+    
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename="volunteers-export.xlsx"');
+    res.send(buffer);
   } catch (err) {
     next(err);
   }
