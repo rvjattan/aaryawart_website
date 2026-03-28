@@ -346,10 +346,10 @@
 
       // Close suggestions when clicking outside
       document.addEventListener('click', (e) => {
-        if (e.target !== stateInput && e.target !== stateSuggestionsBox) {
+        if (e.target !== stateInput && !stateSuggestionsBox.contains(e.target)) {
           stateSuggestionsBox.style.display = 'none';
         }
-        if (e.target !== cityInput && e.target !== citySuggestionsBox) {
+        if (e.target !== cityInput && !citySuggestionsBox.contains(e.target)) {
           citySuggestionsBox.style.display = 'none';
         }
       });
