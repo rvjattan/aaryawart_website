@@ -19,45 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// Volunteer Registration Form
-document.addEventListener('DOMContentLoaded', () => {
-  const volunteerForm = document.getElementById('volunteer-form');
-  if (volunteerForm) {
-    volunteerForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const formData = new FormData(volunteerForm);
-      const data = Object.fromEntries(formData);
-      
-      try {
-        const response = await fetch('/api/volunteers', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data),
-        });
-        
-        const result = await response.json();
-        const alertEl = document.getElementById('volunteer-alert');
-        
-        if (result.success) {
-          alertEl.className = 'alert alert-success';
-          alertEl.textContent = 'Thank you for registering! We will contact you soon.';
-          volunteerForm.reset();
-        } else {
-          alertEl.className = 'alert alert-danger';
-          alertEl.textContent = 'Error: ' + (result.message || 'Failed to submit form');
-        }
-        alertEl.classList.remove('d-none');
-      } catch (err) {
-        const alertEl = document.getElementById('volunteer-alert');
-        alertEl.className = 'alert alert-danger';
-        alertEl.textContent = 'Network error: ' + err.message;
-        alertEl.classList.remove('d-none');
-      }
-    });
-  }
-});
-
 // Animate impact counters
 function animateCounter(element, target, duration = 2000) {
   const start = 0;
