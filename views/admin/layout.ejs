@@ -68,6 +68,28 @@
       <%- body %>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      function deleteVolunteer(id, name) {
+        if (confirm(`Are you sure you want to delete volunteer "${name}"?`)) {
+          const form = document.createElement('form');
+          form.method = 'post';
+          form.action = `/admin/volunteers/${id}/delete`;
+          
+          // Add CSRF token from page if available
+          const csrfToken = document.querySelector('input[name="_csrf"]');
+          if (csrfToken) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = '_csrf';
+            input.value = csrfToken.value;
+            form.appendChild(input);
+          }
+          
+          document.body.appendChild(form);
+          form.submit();
+        }
+      }
+    </script>
   </body>
 </html>
 

@@ -37,6 +37,7 @@
           <td>${new Date(v.registered_date).toLocaleDateString()}</td>
           <td class="text-end">
             <a href="/admin/volunteers/${v.id}" class="btn btn-sm btn-outline-secondary">View</a>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteVolunteer(${v.id}, '${v.name.replace(/'/g, "\\'")}')">Delete</button>
           </td>
         </tr>
       `).join('')}
