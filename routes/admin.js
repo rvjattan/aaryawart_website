@@ -4,6 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { generateToken, authRequired, roleRequired } = require('../middleware/auth');
+const { csrfProtection } = require('../middleware/csrf');
 const { loginLimiter } = require('../middleware/rateLimiter');
 const { findByUsername, listAdmins, updateAdminRole, createAdmin, findByEmail, deleteAdmin } = require('../models/adminModel');
 const volunteerModel = require('../models/volunteerModel');
@@ -14,6 +15,7 @@ const contentModel = require('../models/contentModel');
 const testimonialModel = require('../models/testimonialModel');
 
 const router = express.Router();
+const uploadRouter = express.Router();
 
 // ✅ Use /tmp on Vercel (the only writable directory), local path otherwise
 const uploadDir = process.env.VERCEL
@@ -330,10 +332,11 @@ router.get('/blogs/new', roleRequired(['SUPER_ADMIN', 'EDITOR']), (req, res) => 
   });
 });
 
-router.post(
+uploadRouter.post(
   '/blogs',
   roleRequired(['SUPER_ADMIN', 'EDITOR']),
   upload.single('featured_image'),
+  csrfProtection,
   handleUploadErrors,
   async (req, res, next) => {
     try {
@@ -370,10 +373,11 @@ router.get('/blogs/:id/edit', roleRequired(['SUPER_ADMIN', 'EDITOR']), async (re
   }
 });
 
-router.post(
+uploadRouter.post(
   '/blogs/:id',
   roleRequired(['SUPER_ADMIN', 'EDITOR']),
   upload.single('featured_image'),
+  csrfProtection,
   handleUploadErrors,
   async (req, res, next) => {
     try {
@@ -430,10 +434,11 @@ router.get('/media', async (req, res, next) => {
   }
 });
 
-router.post(
+uploadRouter.post(
   '/media/upload',
   roleRequired(['SUPER_ADMIN', 'EDITOR']),
   upload.array('files', 10),
+  csrfProtection,
   handleUploadErrors,
   async (req, res, next) => {
     try {
@@ -887,5 +892,8 @@ router.post('/testimonials/:id/delete', roleRequired(['SUPER_ADMIN', 'MODERATOR'
   }
 });
 
-module.exports = router;
+module.exports = {
+  adminRoutes: router,
+  adminUploadRoutes: uploadRouter,
+};
 

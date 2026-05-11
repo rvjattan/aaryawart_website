@@ -1,6 +1,6 @@
 <%- include('../layout', { title, user, body: `
   <h3>${mode === 'create' ? 'New' : 'Edit'} Blog Post</h3>
-  <form method="post" enctype="multipart/form-data">
+  <form method="post" action="${mode === 'create' ? '/admin/blogs' : '/admin/blogs/' + post.id}" enctype="multipart/form-data">
     <!-- ✅ CSRF token for protection against cross-site request forgery -->
     <input type="hidden" name="_csrf" value="${csrfToken}">
     <div class="mb-3">

@@ -9,7 +9,7 @@ const bodyParser = require('body-parser');
 require('dotenv').config();
 
 const apiRoutes = require('./routes/api');
-const adminRoutes = require('./routes/admin');
+const { adminRoutes, adminUploadRoutes } = require('./routes/admin');
 const { csrfProtection, csrfTokenMiddleware } = require('./middleware/csrf');
 const blogModel = require('./models/blogModel');
 const statsModel = require('./models/statsModel');
@@ -217,8 +217,10 @@ app.get('/testimonials', (req, res) => {
 // API routes
 app.use('/api', apiRoutes);
 
+// Admin upload routes that need multer parsing before CSRF validation
+app.use('/admin', adminUploadRoutes);
 
-// CSRF protection for admin routes
+// CSRF protection for all other admin routes
 app.use('/admin', csrfProtection, csrfTokenMiddleware);
 
 // Admin routes
