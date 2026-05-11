@@ -16,7 +16,6 @@ const testimonialModel = require('../models/testimonialModel');
 
 const router = express.Router();
 const uploadRouter = express.Router();
-uploadRouter.use(authRequired);
 
 // ✅ Use /tmp on Vercel (the only writable directory), local path otherwise
 const uploadDir = process.env.VERCEL
@@ -393,6 +392,7 @@ router.get('/blogs/new', roleRequired(['SUPER_ADMIN', 'EDITOR']), (req, res) => 
 
 uploadRouter.post(
   '/blogs',
+  authRequired,
   roleRequired(['SUPER_ADMIN', 'EDITOR']),
   upload.single('featured_image'),
   csrfProtection,
@@ -434,6 +434,7 @@ router.get('/blogs/:id/edit', roleRequired(['SUPER_ADMIN', 'EDITOR']), async (re
 
 uploadRouter.post(
   '/blogs/:id',
+  authRequired,
   roleRequired(['SUPER_ADMIN', 'EDITOR']),
   upload.single('featured_image'),
   csrfProtection,
@@ -496,6 +497,7 @@ router.get('/media', async (req, res, next) => {
 
 uploadRouter.post(
   '/media/upload',
+  authRequired,
   roleRequired(['SUPER_ADMIN', 'EDITOR']),
   upload.array('files', 10),
   csrfProtection,
