@@ -16,6 +16,7 @@ const testimonialModel = require('../models/testimonialModel');
 
 const router = express.Router();
 const uploadRouter = express.Router();
+uploadRouter.use(authRequired);
 
 // ✅ Use /tmp on Vercel (the only writable directory), local path otherwise
 const uploadDir = process.env.VERCEL
