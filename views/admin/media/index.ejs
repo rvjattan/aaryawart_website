@@ -14,6 +14,7 @@
 
   <form method="post" action="/admin/media/upload" enctype="multipart/form-data" class="mb-4">
     <input type="hidden" name="_csrf" value="${csrfToken}" />
+    ${error ? `<div class="alert alert-danger">${error}</div>` : ''}
     <div class="mb-2">
       <label class="form-label">Upload Files</label>
       <input type="file" name="files" class="form-control" multiple />

@@ -68,22 +68,80 @@ const upload = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit
+    fileSize: 20 * 1024 * 1024, // 20MB limit
   },
 });
 
 // ✅ Middleware to handle multer errors
 const handleUploadErrors = (err, req, res, next) => {
   if (err instanceof multer.MulterError) {
-    if (err.code === 'FILE_TOO_LARGE') {
-      return res.status(400).json({ success: false, message: 'File size exceeds 5MB limit' });
+    const isHtml = req.headers.accept && req.headers.accept.includes('text/html');
+    const message =
+      err.code === 'LIMIT_FILE_SIZE' || err.code === 'FILE_TOO_LARGE'
+        ? 'File size exceeds 5MB limit'
+        : err.code === 'LIMIT_FILE_COUNT'
+        ? 'Too many files. Maximum 10 files allowed'
+        : `Upload error: ${err.message}`;
+
+    if (isHtml && req.path.startsWith('/blogs')) {
+      const mode = req.path === '/blogs' ? 'create' : 'edit';
+      const post = {
+        id: req.params.id,
+        title: req.body.title || '',
+        category: req.body.category || '',
+        author: req.body.author || '',
+        publish_date: req.body.publish_date || '',
+        status: req.body.status || 'DRAFT',
+        content: req.body.content || '',
+      };
+      return res.status(400).render('admin/blogs/form', {
+        title: mode === 'create' ? 'New Blog Post' : 'Edit Blog Post',
+        user: req.user,
+        post,
+        mode,
+        error: message,
+      });
+    }
+
+    if (isHtml && req.path === '/media/upload') {
+      const query = new URLSearchParams(req.query);
+      query.set('error', message);
+      return res.redirect(`/admin/media?${query.toString()}`);
+    }
+
+    if (err.code === 'LIMIT_FILE_SIZE' || err.code === 'FILE_TOO_LARGE') {
+      return res.status(400).json({ success: false, message });
     }
     if (err.code === 'LIMIT_FILE_COUNT') {
-      return res.status(400).json({ success: false, message: 'Too many files. Maximum 10 files allowed' });
+      return res.status(400).json({ success: false, message });
     }
-    return res.status(400).json({ success: false, message: `Upload error: ${err.message}` });
+    return res.status(400).json({ success: false, message });
   } else if (err) {
-    // Custom file filter errors
+    const isHtml = req.headers.accept && req.headers.accept.includes('text/html');
+    if (isHtml && req.path.startsWith('/blogs')) {
+      const mode = req.path === '/blogs' ? 'create' : 'edit';
+      const post = {
+        id: req.params.id,
+        title: req.body.title || '',
+        category: req.body.category || '',
+        author: req.body.author || '',
+        publish_date: req.body.publish_date || '',
+        status: req.body.status || 'DRAFT',
+        content: req.body.content || '',
+      };
+      return res.status(400).render('admin/blogs/form', {
+        title: mode === 'create' ? 'New Blog Post' : 'Edit Blog Post',
+        user: req.user,
+        post,
+        mode,
+        error: err.message,
+      });
+    }
+    if (isHtml && req.path === '/media/upload') {
+      const query = new URLSearchParams(req.query);
+      query.set('error', err.message);
+      return res.redirect(`/admin/media?${query.toString()}`);
+    }
     return res.status(400).json({ success: false, message: err.message });
   }
   next();
@@ -422,13 +480,14 @@ router.post(
 // Media library
 router.get('/media', async (req, res, next) => {
   try {
-    const { page = 1, type } = req.query;
+    const { page = 1, type, error = null } = req.query;
     const result = await mediaModel.getMedia({ page, limit: 40, type });
     res.render('admin/media/index', {
       title: 'Media Library',
       user: req.user,
       ...result,
       filters: { type },
+      error,
     });
   } catch (err) {
     next(err);

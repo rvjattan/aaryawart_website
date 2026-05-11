@@ -3,6 +3,7 @@
   <form method="post" action="${mode === 'create' ? '/admin/blogs' : '/admin/blogs/' + post.id}" enctype="multipart/form-data">
     <!-- ✅ CSRF token for protection against cross-site request forgery -->
     <input type="hidden" name="_csrf" value="${csrfToken}">
+    ${error ? `<div class="alert alert-danger">${error}</div>` : ''}
     <div class="mb-3">
       <label class="form-label">Title</label>
       <input type="text" name="title" class="form-control" required value="${post.title || ''}" />
