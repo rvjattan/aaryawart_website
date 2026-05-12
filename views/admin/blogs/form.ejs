@@ -1,4 +1,4 @@
-<% const { csrfToken } = locals; %>
+<% const { csrfToken = '', error = '', mode = 'create', post = {}, user = {} } = typeof locals !== 'undefined' ? locals : {}; %>
 <%- include('../layout', { title, user, body: `
   <h3>${mode === 'create' ? 'New' : 'Edit'} Blog Post</h3>
   <form method="post" action="${mode === 'create' ? '/admin/blogs' : '/admin/blogs/' + post.id}" enctype="multipart/form-data">

@@ -1,4 +1,4 @@
-<% const { csrfToken } = locals; %>
+<% const { csrfToken = '', error = '', mode = 'create', admin = {}, user = {} } = typeof locals !== 'undefined' ? locals : {}; %>
 <%- include('../layout', { title, user, body: `
   <div class="row">
     <div class="col-md-6">
