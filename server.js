@@ -6,7 +6,7 @@ const morgan = require('morgan');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-require('dotenv').config();
+// require('dotenv').config(); // Already required at top
 
 const apiRoutes = require('./routes/api');
 const { adminRoutes, adminUploadRoutes } = require('./routes/admin');
