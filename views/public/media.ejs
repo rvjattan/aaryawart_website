@@ -111,8 +111,9 @@
       <h1 class="mb-4">Media & Publications</h1>
 
       <h2 class="mb-3">Blog & News</h2>
-      <p class="small">Latest blog posts and news can be managed from the admin panel and displayed here via API integration.</p>
-      <p class="small text-muted">For a full implementation, fetch /api/blogs via JavaScript and render cards.</p>
+      <div id="blogs-container">
+        <p class="text-muted">Loading blog posts...</p>
+      </div>
 
       <hr class="my-4" />
 
@@ -211,5 +212,151 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/static/js/main.js"></script>
+    
+    <script>
+      (async function() {
+        const container = document.getElementById('blogs-container');
+        
+        try {
+          const response = await fetch('/api/blogs?limit=20');
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          
+          const result = await response.json();
+          if (!result.success || !result.data || result.data.length === 0) {
+            container.innerHTML = '<p class="text-muted">No blog posts available yet.</p>';
+            return;
+          }
+          
+          // Check if there's a blog ID in the URL hash
+          const hashMatch = window.location.hash.match(/blog-(\d+)/);
+          const selectedBlogId = hashMatch ? parseInt(hashMatch[1]) : null;
+          
+          // Create blog cards
+          let html = '<div class="row row-cols-1 row-cols-md-2 g-3 mb-4">';
+          result.data.forEach(blog => {
+            const excerpt = (blog.content || '')
+              .replace(/<[^>]+>/g, '')
+              .substring(0, 150)
+              .replace(/&/g, '&amp;')
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;');
+            
+            html += `
+              <div class="col">
+                <div class="card h-100 cursor-pointer blog-card" data-blog-id="${blog.id}">
+                  ${blog.featured_image ? `<img src="${blog.featured_image}" class="card-img-top" alt="${blog.title}" />` : ''}
+                  <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">${blog.title}</h5>
+                    <p class="card-text text-muted small mb-2">${blog.category || 'General'} • ${new Date(blog.publish_date).toLocaleDateString()}</p>
+                    <p class="card-text flex-grow-1">${excerpt}...</p>
+                    <button class="btn btn-sm btn-primary mt-auto read-more-btn" data-blog-id="${blog.id}">Read More</button>
+                  </div>
+                </div>
+              </div>
+            `;
+          });
+          html += '</div>';
+          
+          // Add detail section (initially hidden)
+          html += `
+            <div id="blog-detail" class="blog-detail-section mb-4" style="display: none;">
+              <button class="btn btn-secondary btn-sm mb-3" id="back-to-list">← Back to List</button>
+              <article class="blog-detail-content"></article>
+            </div>
+          `;
+          
+          container.innerHTML = html;
+          
+          // Add event listeners
+          document.querySelectorAll('.read-more-btn').forEach(btn => {
+            btn.addEventListener('click', showBlogDetail);
+          });
+          
+          document.querySelectorAll('.blog-card').forEach(card => {
+            card.addEventListener('click', function() {
+              const btn = this.querySelector('.read-more-btn');
+              btn.click();
+            });
+          });
+          
+          document.getElementById('back-to-list').addEventListener('click', function() {
+            document.getElementById('blogs-list').style.display = 'block';
+            document.getElementById('blog-detail').style.display = 'none';
+            window.location.hash = '#blogs-container';
+          });
+          
+          // Wrap the cards in a container for toggling
+          const listHtml = container.innerHTML;
+          container.innerHTML = `<div id="blogs-list">${listHtml}</div>`;
+          
+          // Re-attach event listeners after wrapping
+          document.querySelectorAll('.read-more-btn').forEach(btn => {
+            btn.addEventListener('click', showBlogDetail);
+          });
+          
+          document.querySelectorAll('.blog-card').forEach(card => {
+            card.addEventListener('click', function() {
+              const btn = this.querySelector('.read-more-btn');
+              btn.click();
+            });
+          });
+          
+          // If a blog was selected via hash, show it
+          if (selectedBlogId) {
+            const btn = document.querySelector(`[data-blog-id="${selectedBlogId}"]`);
+            if (btn) {
+              const readMoreBtn = btn.querySelector('.read-more-btn');
+              if (readMoreBtn) readMoreBtn.click();
+            }
+          }
+          
+          window.showBlogDetail = async function(e) {
+            const blogId = e.target.getAttribute('data-blog-id');
+            
+            try {
+              const blogResponse = await fetch(`/api/blogs/${blogId}`);
+              if (!blogResponse.ok) {
+                alert('Error loading blog post');
+                return;
+              }
+              
+              const blogResult = await blogResponse.json();
+              if (!blogResult.success) {
+                alert('Blog post not found');
+                return;
+              }
+              
+              const blog = blogResult.data;
+              const detailContent = document.querySelector('.blog-detail-content');
+              
+              detailContent.innerHTML = `
+                <h2>${blog.title}</h2>
+                <p class="text-muted">
+                  <small><strong>By ${blog.author}</strong> • ${blog.category || 'General'} • ${new Date(blog.publish_date).toLocaleDateString()}</small>
+                </p>
+                ${blog.featured_image ? `<img src="${blog.featured_image}" class="img-fluid mb-3 rounded" alt="${blog.title}" />` : ''}
+                <div class="blog-content">
+                  ${blog.content}
+                </div>
+              `;
+              
+              document.getElementById('blogs-list').style.display = 'none';
+              document.getElementById('blog-detail').style.display = 'block';
+              window.location.hash = `blog-${blogId}`;
+              window.scrollTo(0, 0);
+            } catch (err) {
+              console.error('Error loading blog detail:', err);
+              alert('Error loading blog post');
+            }
+          };
+          
+        } catch (err) {
+          console.error('Error fetching blogs:', err);
+          container.innerHTML = `<p class="text-danger">Error loading blog posts: ${err.message}</p>`;
+        }
+      })();
+    </script>
   </body>
 </html>
