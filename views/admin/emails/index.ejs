@@ -1,3 +1,4 @@
+<% const { csrfToken } = locals; %>
 <%- include('../layout', { title, user, body: `
   <h3>Email Volunteers</h3>
   ${message ? `<div class="alert alert-success">${message}</div>` : ''}
