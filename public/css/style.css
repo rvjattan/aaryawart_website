@@ -179,6 +179,38 @@ a, button, .btn, input, select, textarea {
   font-style: italic;
 }
 
+.twitter-panel,
+.sticky-twitter-panel {
+  background: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+}
+
+.sticky-twitter-panel {
+  position: relative;
+}
+
+@media (min-width: 992px) {
+  .sticky-twitter-panel {
+    position: sticky;
+    top: 1rem;
+  }
+}
+
+.twitter-panel h2,
+.sticky-twitter-panel h2 {
+  margin-bottom: 1rem;
+  font-size: 1.05rem;
+}
+
+.twitter-panel a.twitter-timeline,
+.sticky-twitter-panel a.twitter-timeline {
+  width: 100% !important;
+  min-height: 430px;
+}
+
 .timeline {
   list-style: none;
   padding-left: 0;

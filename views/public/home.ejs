@@ -198,6 +198,10 @@
         <% } %>
       </div>
       <div class="col-md-4">
+        <aside class="sticky-twitter-panel mb-4">
+          <h2 class="h5 mb-3">Recent Tweets</h2>
+          <a class="twitter-timeline" data-theme="light" data-chrome="noheader nofooter noborders transparent" data-tweet-limit="3" href="https://twitter.com/seva_nyaas?ref_src=twsrc%5Etfw">Tweets by seva_nyaas</a>
+        </aside>
         <h2 class="mb-3">Testimonials</h2>
         <% if (testimonials && testimonials.length) { %>
           <% testimonials.forEach(function(t) { %>
@@ -227,6 +231,7 @@
   </div>
 </section>
 <script src="/static/js/counters.js"></script>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
     </main>
 
