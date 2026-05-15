@@ -127,6 +127,16 @@ app.use(async (req, res, next) => {
         .replace(/'/g, '&#x27;')
         .replace(/\//g, '&#x2F;');
     };
+
+    // ✅ Global date formatting helper for all views
+    res.locals.formatDate = (date) => {
+      if (!date) return '';
+      return new Date(date).toLocaleDateString('en-IN', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      });
+    };
   } catch (e) {
     res.locals.settings = null;
   }

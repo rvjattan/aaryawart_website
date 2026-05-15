@@ -35,7 +35,7 @@
           <td>${b.title}</td>
           <td>${b.category || ''}</td>
           <td>${b.author}</td>
-          <td>${b.publish_date}</td>
+          <td>${formatDate(b.publish_date)}</td>
           <td>
             <span class="badge ${b.status === 'PUBLISHED' ? 'bg-success' : 'bg-secondary'}">
               ${b.status}

@@ -188,7 +188,7 @@
               <a href="/media#blog-<%= b.id %>" class="list-group-item list-group-item-action">
                 <div class="d-flex w-100 justify-content-between">
                   <h5 class="mb-1"><%= b.title %></h5>
-                  <small><%= b.publish_date %></small>
+                  <small><%= formatDate(b.publish_date) %></small>
                 </div>
                 <p class="mb-1"><%= (b.content || '').replace(/<[^>]+>/g, '').substring(0, 150) %>...</p>
                 <small><%= b.category || '' %> - <%= b.author %></small>
