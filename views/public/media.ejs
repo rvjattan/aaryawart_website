@@ -233,6 +233,48 @@
           const hashMatch = window.location.hash.match(/blog-(\d+)/);
           const selectedBlogId = hashMatch ? parseInt(hashMatch[1]) : null;
           
+          // Define blog detail function first, before attaching listeners
+          async function showBlogDetail(e) {
+            const blogId = e.target.getAttribute('data-blog-id');
+            
+            try {
+              const blogResponse = await fetch(`/api/blogs/${blogId}`);
+              if (!blogResponse.ok) {
+                alert('Error loading blog post');
+                return;
+              }
+              
+              const blogResult = await blogResponse.json();
+              if (!blogResult.success) {
+                alert('Blog post not found');
+                return;
+              }
+              
+              const blog = blogResult.data;
+              const detailContent = document.querySelector('.blog-detail-content');
+              
+              detailContent.innerHTML = `
+                <h2>${blog.title}</h2>
+                <p class="text-muted">
+                  <small><strong>By ${blog.author}</strong> • ${blog.category || 'General'} • ${new Date(blog.publish_date).toLocaleDateString()}</small>
+                </p>
+                ${blog.featured_image ? `<img src="${blog.featured_image}" class="img-fluid mb-3 rounded" alt="${blog.title}" />` : ''}
+                <div class="blog-content">
+                  ${blog.content}
+                </div>
+              `;
+              
+              document.getElementById('blogs-list').style.display = 'none';
+              document.getElementById('blog-detail').style.display = 'block';
+              window.location.hash = `blog-${blogId}`;
+              window.scrollTo(0, 0);
+            } catch (err) {
+              console.error('Error loading blog detail:', err);
+              alert('Error loading blog post');
+            }
+          }
+          window.showBlogDetail = showBlogDetail;
+          
           // Create blog cards
           let html = '<div class="row row-cols-1 row-cols-md-2 g-3 mb-4">';
           result.data.forEach(blog => {
@@ -311,46 +353,6 @@
               if (readMoreBtn) readMoreBtn.click();
             }
           }
-          
-          window.showBlogDetail = async function(e) {
-            const blogId = e.target.getAttribute('data-blog-id');
-            
-            try {
-              const blogResponse = await fetch(`/api/blogs/${blogId}`);
-              if (!blogResponse.ok) {
-                alert('Error loading blog post');
-                return;
-              }
-              
-              const blogResult = await blogResponse.json();
-              if (!blogResult.success) {
-                alert('Blog post not found');
-                return;
-              }
-              
-              const blog = blogResult.data;
-              const detailContent = document.querySelector('.blog-detail-content');
-              
-              detailContent.innerHTML = `
-                <h2>${blog.title}</h2>
-                <p class="text-muted">
-                  <small><strong>By ${blog.author}</strong> • ${blog.category || 'General'} • ${new Date(blog.publish_date).toLocaleDateString()}</small>
-                </p>
-                ${blog.featured_image ? `<img src="${blog.featured_image}" class="img-fluid mb-3 rounded" alt="${blog.title}" />` : ''}
-                <div class="blog-content">
-                  ${blog.content}
-                </div>
-              `;
-              
-              document.getElementById('blogs-list').style.display = 'none';
-              document.getElementById('blog-detail').style.display = 'block';
-              window.location.hash = `blog-${blogId}`;
-              window.scrollTo(0, 0);
-            } catch (err) {
-              console.error('Error loading blog detail:', err);
-              alert('Error loading blog post');
-            }
-          };
           
         } catch (err) {
           console.error('Error fetching blogs:', err);
