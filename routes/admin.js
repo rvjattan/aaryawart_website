@@ -62,7 +62,7 @@ const upload = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: 20 * 1024 * 1024, // 20MB limit
+    fileSize: 500 * 1024 * 1024, // 500MB limit
   },
 });
 
@@ -72,7 +72,7 @@ const handleUploadErrors = (err, req, res, next) => {
     const isHtml = req.headers.accept && req.headers.accept.includes('text/html');
     const message =
       err.code === 'LIMIT_FILE_SIZE' || err.code === 'FILE_TOO_LARGE'
-        ? 'File size exceeds 5MB limit'
+        ? 'File size exceeds 500MB limit'
         : err.code === 'LIMIT_FILE_COUNT'
         ? 'Too many files. Maximum 10 files allowed'
         : `Upload error: ${err.message}`;
