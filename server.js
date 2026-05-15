@@ -209,10 +209,17 @@ app.get('/media', async (req, res, next) => {
       blogModel.getBlogs({ page: 1, limit: 20, status: 'PUBLISHED' }),
       mediaModel.getMedia({ page: 1, limit: 40, type: 'image/' }),
     ]);
+
+    const mediaImages = (media.data || []).filter((image) => {
+      if (!image.file_path) return false;
+      const normalized = image.file_path.toLowerCase();
+      return !normalized.includes('/uploads/leader');
+    });
+
     res.render('public/media', {
       title: 'Media & Publications',
       blogs: blogs.data || [],
-      mediaImages: media.data || [],
+      mediaImages,
     });
   } catch (err) {
     next(err);
