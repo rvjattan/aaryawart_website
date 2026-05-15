@@ -247,155 +247,108 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/static/js/main.js"></script>
-    
+
     <script>
-      (async function() {
-        const container = document.getElementById('blogs-container');
+      document.addEventListener('DOMContentLoaded', () => {
+        const listSection = document.getElementById('blogs-list');
+        const detailSection = document.getElementById('blog-detail');
+        const detailContent = document.querySelector('.blog-detail-content');
+        const backButton = document.getElementById('back-to-list');
 
-        try {
-          const response = await fetch('/api/blogs?limit=20');
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
+        function formatDate(value) {
+          const date = new Date(value);
+          return isNaN(date.getTime()) ? String(value) : date.toLocaleDateString();
+        }
 
-          const result = await response.json();
-          if (!result.success || !Array.isArray(result.data) || result.data.length === 0) {
-            container.innerHTML = '<p class="text-muted">No blog posts available yet.</p>';
-            return;
-          }
+        function escapeText(text) {
+          return String(text || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+        }
 
-          const hashMatch = window.location.hash.match(/blog-(\d+)/);
-          const selectedBlogId = hashMatch ? parseInt(hashMatch[1], 10) : null;
+        function getImageSrc(src) {
+          if (!src) return '';
+          if (/^https?:\/\//i.test(src)) return src;
+          return src.startsWith('/') ? src : '/' + src;
+        }
 
-          function formatDate(value) {
-            const date = new Date(value);
-            return isNaN(date.getTime()) ? String(value) : date.toLocaleDateString();
-          }
+        async function showBlogDetail(blogId) {
+          if (!blogId) return;
 
-          function escapeText(text) {
-            return String(text || '')
-              .replace(/&/g, '&amp;')
-              .replace(/</g, '&lt;')
-              .replace(/>/g, '&gt;');
-          }
-
-          function getImageSrc(src) {
-            if (!src) return '';
-            if (/^https?:\/\//i.test(src)) return src;
-            return src.startsWith('/') ? src : '/' + src;
-          }
-
-          function renderExcerpt(content) {
-            return escapeText((content || '').replace(/<[^>]+>/g, '').substring(0, 150));
-          }
-
-          async function showBlogDetail(event) {
-            event.preventDefault();
-            const blogId = event.currentTarget.getAttribute('data-blog-id');
-            if (!blogId) return;
-
-            try {
-              const blogResponse = await fetch(`/api/blogs/${blogId}`);
-              if (!blogResponse.ok) {
-                alert('Error loading blog post');
-                return;
-              }
-
-              const blogResult = await blogResponse.json();
-              if (!blogResult.success || !blogResult.data) {
-                alert('Blog post not found');
-                return;
-              }
-
-              const blog = blogResult.data;
-              const detailContent = document.querySelector('.blog-detail-content');
-
-              detailContent.innerHTML = `
-                <h2>${escapeText(blog.title)}</h2>
-                <p class="text-muted">
-                  <small><strong>By ${escapeText(blog.author)}</strong> • ${escapeText(blog.category || 'General')} • ${escapeText(formatDate(blog.publish_date))}</small>
-                </p>
-                ${blog.featured_image ? `<img src="${getImageSrc(blog.featured_image)}" class="img-fluid mb-3 rounded" alt="${escapeText(blog.title)}" onerror="this.onerror=null;this.style.display='none'" />` : ''}
-                <div class="blog-content">
-                  ${blog.content || ''}
-                </div>
-              `;
-
-              document.getElementById('blogs-list').style.display = 'none';
-              document.getElementById('blog-detail').style.display = 'block';
-              window.location.hash = `blog-${blogId}`;
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            } catch (err) {
-              console.error('Error loading blog detail:', err);
+          try {
+            const response = await fetch(`/api/blogs/${blogId}`);
+            if (!response.ok) {
               alert('Error loading blog post');
+              return;
             }
-          }
 
-          window.showBlogDetail = showBlogDetail;
+            const result = await response.json();
+            if (!result.success || !result.data) {
+              alert('Blog post not found');
+              return;
+            }
 
-          const blogCards = result.data.map(blog => {
-            const excerpt = renderExcerpt(blog.content);
-            const imageSrc = blog.featured_image ? getImageSrc(blog.featured_image) : '';
-            return `
-              <div class="col">
-                <div class="card h-100 cursor-pointer blog-card" data-blog-id="${blog.id}">
-                  ${imageSrc ? `<img src="${imageSrc}" class="card-img-top" alt="${escapeText(blog.title)}" onerror="this.onerror=null;this.style.display='none'" />` : ''}
-                  <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">${escapeText(blog.title)}</h5>
-                    <p class="card-text text-muted small mb-2">${escapeText(blog.category || 'General')} • ${escapeText(formatDate(blog.publish_date))}</p>
-                    <p class="card-text flex-grow-1">${excerpt}...</p>
-                    <button class="btn btn-sm btn-primary mt-auto read-more-btn" data-blog-id="${blog.id}">Read More</button>
-                  </div>
-                </div>
-              </div>
+            const blog = result.data;
+            detailContent.innerHTML = `
+              <h2>${escapeText(blog.title)}</h2>
+              <p class="text-muted">
+                <small><strong>By ${escapeText(blog.author)}</strong> • ${escapeText(blog.category || 'General')} • ${escapeText(formatDate(blog.publish_date))}</small>
+              </p>
+              ${blog.featured_image ? `<img src="${getImageSrc(blog.featured_image)}" class="img-fluid mb-3 rounded" alt="${escapeText(blog.title)}" onerror="this.onerror=null;this.style.display='none'" />` : ''}
+              <div class="blog-content">${blog.content || ''}</div>
             `;
-          }).join('');
 
-          container.innerHTML = `
-            <div id="blogs-list">
-              <div class="row row-cols-1 row-cols-md-2 g-3 mb-4">
-                ${blogCards}
-              </div>
-            </div>
-            <div id="blog-detail" class="blog-detail-section mb-4" style="display: none;">
-              <button class="btn btn-secondary btn-sm mb-3" id="back-to-list">← Back to List</button>
-              <article class="blog-detail-content"></article>
-            </div>
-          `;
+            if (listSection) listSection.style.display = 'none';
+            if (detailSection) detailSection.style.display = 'block';
+            window.location.hash = `blog-${blogId}`;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          } catch (err) {
+            console.error('Error loading blog detail:', err);
+            alert('Error loading blog post');
+          }
+        }
 
-          const listSection = document.getElementById('blogs-list');
-          const detailSection = document.getElementById('blog-detail');
-
-          container.querySelectorAll('.read-more-btn').forEach(btn => {
-            btn.addEventListener('click', showBlogDetail);
+        function attachEvents() {
+          const buttons = document.querySelectorAll('.read-more-btn');
+          buttons.forEach(btn => {
+            btn.addEventListener('click', event => {
+              event.preventDefault();
+              const blogId = btn.getAttribute('data-blog-id');
+              showBlogDetail(blogId);
+            });
           });
 
-          container.querySelectorAll('.blog-card').forEach(card => {
-            card.addEventListener('click', function(event) {
+          const cards = document.querySelectorAll('.blog-card');
+          cards.forEach(card => {
+            card.addEventListener('click', event => {
               if (event.target.closest('.read-more-btn')) return;
-              const btn = this.querySelector('.read-more-btn');
+              const btn = card.querySelector('.read-more-btn');
               if (btn) btn.click();
             });
           });
 
-          document.getElementById('back-to-list').addEventListener('click', function(event) {
-            event.preventDefault();
-            detailSection.style.display = 'none';
-            listSection.style.display = 'block';
-            window.location.hash = '#blogs-container';
-          });
-
-          if (selectedBlogId) {
-            const selectedButton = container.querySelector(`.read-more-btn[data-blog-id="${selectedBlogId}"]`);
-            if (selectedButton) {
-              selectedButton.click();
-            }
+          if (backButton) {
+            backButton.addEventListener('click', event => {
+              event.preventDefault();
+              if (detailSection) detailSection.style.display = 'none';
+              if (listSection) listSection.style.display = 'block';
+              window.location.hash = '#blogs-container';
+            });
           }
-        } catch (err) {
-          console.error('Error fetching blogs:', err);
-          container.innerHTML = `<p class="text-danger">Error loading blog posts: ${escapeText(err.message)}</p>`;
         }
-      })();
+
+        attachEvents();
+
+        const hashMatch = window.location.hash.match(/blog-(\d+)/);
+        if (hashMatch) {
+          const selectedBlogId = hashMatch[1];
+          const selectedButton = document.querySelector(`.read-more-btn[data-blog-id="${selectedBlogId}"]`);
+          if (selectedButton) {
+            selectedButton.click();
+          }
+        }
+      });
     </script>
   </body>
 </html>
