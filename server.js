@@ -205,8 +205,16 @@ app.get('/', async (req, res, next) => {
   }
 });
 
-app.get('/about', (req, res) => {
-  res.render('public/about', { title: 'About Us' });
+app.get('/about', async (req, res, next) => {
+  try {
+    const pdfMedia = await mediaModel.getMedia({ page: 1, limit: 50, type: 'application/pdf' });
+    res.render('public/about', {
+      title: 'About Us',
+      pdfFiles: pdfMedia.data || [],
+    });
+  } catch (err) {
+    next(err);
+  }
 });
 
 app.get('/activities', (req, res) => {
@@ -215,9 +223,10 @@ app.get('/activities', (req, res) => {
 
 app.get('/media', async (req, res, next) => {
   try {
-    const [blogs, media] = await Promise.all([
+    const [blogs, media, pdfMedia] = await Promise.all([
       blogModel.getBlogs({ page: 1, limit: 20, status: 'PUBLISHED' }),
       mediaModel.getMedia({ page: 1, limit: 40, type: 'image/' }),
+      mediaModel.getMedia({ page: 1, limit: 50, type: 'application/pdf' }),
     ]);
 
     const mediaImages = (media.data || []).filter((image) => {
@@ -230,6 +239,7 @@ app.get('/media', async (req, res, next) => {
       title: 'Media & Publications',
       blogs: blogs.data || [],
       mediaImages,
+      pdfFiles: pdfMedia.data || [],
     });
   } catch (err) {
     next(err);

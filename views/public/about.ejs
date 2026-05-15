@@ -227,10 +227,17 @@
       <hr class="my-5" />
 
       <h2 class="mb-3">Annual Reports & Partners</h2>
-      <p>Download recent annual reports (sample placeholders, replace with real PDFs):</p>
+      <p>Download recent annual reports and publications:</p>
       <ul>
-        <li><a href="/static/docs/annual-report-2023.pdf" target="_blank">Annual Report 2023</a></li>
-        <li><a href="/static/docs/annual-report-2022.pdf" target="_blank">Annual Report 2022</a></li>
+        <% if (pdfFiles && pdfFiles.length) { %>
+          <% pdfFiles.forEach(function(file) { %>
+            <li>
+              <a href="<%= file.file_path %>" target="_blank"><%= escapeHtml(file.originalname || file.filename || file.file_path) %></a>
+            </li>
+          <% }); %>
+        <% } else { %>
+          <li class="text-muted">No publications uploaded yet.</li>
+        <% } %>
       </ul>
 
       <h3 class="mt-4">Affiliates & Partners</h3>
