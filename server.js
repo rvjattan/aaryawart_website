@@ -190,8 +190,16 @@ app.get('/activities', (req, res) => {
   res.render('public/activities', { title: 'Activities & Programs' });
 });
 
-app.get('/media', (req, res) => {
-  res.render('public/media', { title: 'Media & Publications' });
+app.get('/media', async (req, res, next) => {
+  try {
+    const blogs = await blogModel.getBlogs({ page: 1, limit: 20, status: 'PUBLISHED' });
+    res.render('public/media', {
+      title: 'Media & Publications',
+      blogs: blogs.data || [],
+    });
+  } catch (err) {
+    next(err);
+  }
 });
 
 app.get('/get-involved', (req, res) => {
