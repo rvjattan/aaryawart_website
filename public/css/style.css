@@ -68,6 +68,14 @@ a, button, .btn, input, select, textarea {
   min-height: 100vh;
 }
 
+/* Equal square leader images on About page */
+.leader-card-img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  display: block;
+}
+
 /* Hero section with CSS variables */
 .hero-section {
   background-size: cover;
