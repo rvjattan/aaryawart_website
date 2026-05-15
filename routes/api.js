@@ -146,6 +146,43 @@ router.get('/blogs', async (req, res, next) => {
   }
 });
 
+// Public API: contact form submission
+router.post('/contact', async (req, res) => {
+  try {
+    const { name, email, message } = req.body || {};
+    const trimmedName = String(name || '').trim();
+    const trimmedEmail = String(email || '').trim();
+    const trimmedMessage = String(message || '').trim();
+
+    if (!trimmedName || !trimmedEmail || !trimmedMessage) {
+      return res.status(400).json({ success: false });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    if (!emailRegex.test(trimmedEmail)) {
+      return res.status(400).json({ success: false });
+    }
+
+    const transporter = createTransporter();
+    const fromAddress = process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER || 'noreply@aaryawart.org';
+    await transporter.sendMail({
+      from: fromAddress,
+      to: 'aaryawartsevanyaas@gmail.com',
+      replyTo: trimmedEmail,
+      subject: 'Website Contact Form Submission',
+      text:
+        `Name: ${trimmedName}\n` +
+        `Email: ${trimmedEmail}\n\n` +
+        `Message:\n${trimmedMessage}`,
+    });
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('[api/contact] Error sending email:', err && err.message);
+    res.status(500).json({ success: false });
+  }
+});
+
 // Public API: blog detail
 router.get('/blogs/:id', async (req, res, next) => {
   try {
