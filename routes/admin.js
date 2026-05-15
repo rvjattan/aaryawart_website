@@ -63,7 +63,7 @@ const upload = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: 500 * 1024 * 1024, // 500MB limit
+    fileSize: 50 * 1024 * 1024, // 50MB limit
   },
 });
 
@@ -84,10 +84,11 @@ async function compressImage(filePath) {
 // ✅ Middleware to handle multer errors
 const handleUploadErrors = (err, req, res, next) => {
   if (err instanceof multer.MulterError) {
+    console.error('[upload error]', err.code, err.message);
     const isHtml = req.headers.accept && req.headers.accept.includes('text/html');
     const message =
       err.code === 'LIMIT_FILE_SIZE' || err.code === 'FILE_TOO_LARGE'
-        ? 'File size exceeds 500MB limit'
+        ? 'File size exceeds 50MB limit'
         : err.code === 'LIMIT_FILE_COUNT'
         ? 'Too many files. Maximum 10 files allowed'
         : `Upload error: ${err.message}`;
@@ -523,7 +524,7 @@ uploadRouter.post(
   '/media/upload',
   authRequired,
   roleRequired(['SUPER_ADMIN', 'EDITOR']),
-  upload.array('files', 10),
+  upload.array('files', 100),
   csrfProtection,
   handleUploadErrors,
   async (req, res, next) => {
