@@ -68,10 +68,11 @@ const upload = multer({
 });
 
 async function compressImage(filePath) {
-  const ext = path.extname(filePath).toLowerCase();
-  if (!['.jpg', '.jpeg', '.png', '.webp'].includes(ext)) return;
+  const ext = path.extname(filePath);
+  const extLower = ext.toLowerCase();
+  if (!['.jpg', '.jpeg', '.png', '.webp'].includes(extLower)) return;
 
-  const compressed = filePath.replace(ext, '_c' + ext);
+  const compressed = filePath.slice(0, filePath.length - ext.length) + '_c.jpg';
   await sharp(filePath)
     .resize(1920, 1920, { fit: 'inside', withoutEnlargement: true })
     .jpeg({ quality: 75, progressive: true })
