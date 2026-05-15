@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const sharp = require('sharp');
 const { generateToken, authRequired, roleRequired } = require('../middleware/auth');
 const { csrfProtection } = require('../middleware/csrf');
 const { loginLimiter } = require('../middleware/rateLimiter');
@@ -65,6 +66,20 @@ const upload = multer({
     fileSize: 500 * 1024 * 1024, // 500MB limit
   },
 });
+
+async function compressImage(filePath) {
+  const ext = path.extname(filePath).toLowerCase();
+  if (!['.jpg', '.jpeg', '.png', '.webp'].includes(ext)) return;
+
+  const compressed = filePath.replace(ext, '_c' + ext);
+  await sharp(filePath)
+    .resize(1920, 1920, { fit: 'inside', withoutEnlargement: true })
+    .jpeg({ quality: 75, progressive: true })
+    .toFile(compressed);
+
+  fs.unlinkSync(filePath);
+  fs.renameSync(compressed, filePath);
+}
 
 // ✅ Middleware to handle multer errors
 const handleUploadErrors = (err, req, res, next) => {
@@ -402,6 +417,9 @@ uploadRouter.post(
   handleUploadErrors,
   async (req, res, next) => {
     try {
+      if (req.file) {
+        await compressImage(req.file.path);
+      }
       const featured_image = req.file ? `/uploads/${req.file.filename}` : null;
       const { title, category, content, author, publish_date, status } = req.body;
       await blogModel.createBlog({
@@ -447,6 +465,9 @@ uploadRouter.post(
       const existing = await blogModel.getBlogById(req.params.id);
       if (!existing) return res.status(404).send('Not found');
 
+      if (req.file) {
+        await compressImage(req.file.path);
+      }
       const featured_image = req.file
         ? `/uploads/${req.file.filename}`
         : existing.featured_image;
@@ -509,6 +530,7 @@ uploadRouter.post(
     try {
       const saved = [];
       for (const file of req.files) {
+        await compressImage(file.path);
         const media = await mediaModel.createMedia({
           filename: file.originalname,
           file_path: `/uploads/${file.filename}`,

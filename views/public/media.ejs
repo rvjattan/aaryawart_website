@@ -14,6 +14,7 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
     />
     <link rel="stylesheet" href="/static/css/style.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css">
   </head>
   <body>
     <header class="border-bottom bg-light">
@@ -120,7 +121,9 @@
                 <div class="col">
                   <div class="card h-100 cursor-pointer blog-card" data-blog-id="<%= blog.id %>">
                     <% if (imageSrc) { %>
-                      <img src="<%= imageSrc %>" class="card-img-top" alt="<%= escapeHtml(blog.title) %>" onerror="this.onerror=null;this.style.display='none'" />
+                      <a href="<%= imageSrc %>" class="glightbox" data-gallery="gallery" data-description="<%= escapeHtml(blog.title) %>">
+                        <img src="<%= imageSrc %>" loading="lazy" class="card-img-top" alt="<%= escapeHtml(blog.title) %>" onerror="this.onerror=null;this.style.display='none'" />
+                      </a>
                     <% } %>
                     <div class="card-body d-flex flex-column">
                       <h5 class="card-title"><%= escapeHtml(blog.title) %></h5>
@@ -149,21 +152,31 @@
         <% if (mediaImages && mediaImages.length) { %>
           <% mediaImages.forEach(function(image) { %>
             <div class="col">
-              <img src="<%= image.file_path %>" class="img-fluid rounded" alt="<%= escapeHtml(image.filename) %>" onerror="this.onerror=null;this.style.display='none'" />
+              <a href="<%= image.file_path %>" class="glightbox" data-gallery="gallery" data-description="<%= escapeHtml(image.filename) %>">
+                <img src="<%= image.file_path %>" loading="lazy" class="img-fluid rounded" alt="<%= escapeHtml(image.filename) %>" onerror="this.onerror=null;this.style.display='none'" />
+              </a>
             </div>
           <% }); %>
         <% } else { %>
           <div class="col">
-            <img src="/static/images/gallery1.jpg" class="img-fluid rounded" alt="Gallery 1" />
+            <a href="/static/images/gallery1.jpg" class="glightbox" data-gallery="gallery" data-description="Gallery 1">
+              <img src="/static/images/gallery1.jpg" loading="lazy" class="img-fluid rounded" alt="Gallery 1" />
+            </a>
           </div>
           <div class="col">
-            <img src="/static/images/gallery2.jpg" class="img-fluid rounded" alt="Gallery 2" />
+            <a href="/static/images/gallery2.jpg" class="glightbox" data-gallery="gallery" data-description="Gallery 2">
+              <img src="/static/images/gallery2.jpg" loading="lazy" class="img-fluid rounded" alt="Gallery 2" />
+            </a>
           </div>
           <div class="col">
-            <img src="/static/images/gallery3.jpg" class="img-fluid rounded" alt="Gallery 3" />
+            <a href="/static/images/gallery3.jpg" class="glightbox" data-gallery="gallery" data-description="Gallery 3">
+              <img src="/static/images/gallery3.jpg" loading="lazy" class="img-fluid rounded" alt="Gallery 3" />
+            </a>
           </div>
           <div class="col">
-            <img src="/static/images/gallery4.jpg" class="img-fluid rounded" alt="Gallery 4" />
+            <a href="/static/images/gallery4.jpg" class="glightbox" data-gallery="gallery" data-description="Gallery 4">
+              <img src="/static/images/gallery4.jpg" loading="lazy" class="img-fluid rounded" alt="Gallery 4" />
+            </a>
           </div>
         <% } %>
       </div>
@@ -279,7 +292,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/static/js/main.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
     <script>
+      const lightbox = GLightbox({ selector: '.glightbox' });
       document.addEventListener('DOMContentLoaded', () => {
         const listSection = document.getElementById('blogs-list');
         const detailSection = document.getElementById('blog-detail');
@@ -331,7 +346,7 @@
               <p class="text-muted">
                 <small><strong>By ${escapeText(blog.author)}</strong> • ${escapeText(blog.category || 'General')} • ${escapeText(formatDate(blog.publish_date))}</small>
               </p>
-              ${blog.featured_image ? `<img src="${getImageSrc(blog.featured_image)}" class="img-fluid mb-3 rounded" alt="${escapeText(blog.title)}" onerror="this.onerror=null;this.style.display='none'" />` : ''}
+              ${blog.featured_image ? `<img src="${getImageSrc(blog.featured_image)}" loading="lazy" class="img-fluid mb-3 rounded" alt="${escapeText(blog.title)}" onerror="this.onerror=null;this.style.display='none'" />` : ''}
               <div class="blog-content">${blog.content || ''}</div>
             `;
 
