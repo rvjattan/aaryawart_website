@@ -13,15 +13,23 @@
     </form>
   </div>
 
-  <form method="post" action="/admin/media/upload" enctype="multipart/form-data" class="mb-4">
+  <form id="uploadForm" enctype="multipart/form-data" class="mb-4">
     <input type="hidden" name="_csrf" value="${csrfToken}" />
     ${error ? `<div class="alert alert-danger">${error}</div>` : ''}
     <div class="mb-2">
       <label class="form-label">Upload Files</label>
-      <input type="file" name="files" class="form-control" multiple />
+      <input type="file" name="files" id="fileInput" class="form-control" multiple />
     </div>
-    <button class="btn btn-primary btn-sm">Upload</button>
+    <button type="submit" id="uploadBtn" class="btn btn-primary btn-sm">Upload</button>
   </form>
+
+  <!-- Progress Bar -->
+  <div id="uploadProgress" class="mb-4" style="display: none;">
+    <div class="progress">
+      <div class="progress-bar" role="progressbar" style="width: 0%" id="progressBar"></div>
+    </div>
+    <small class="text-muted mt-1" id="progressText">Uploading...</small>
+  </div>
 
   <div class="row row-cols-2 row-cols-md-4 g-3">
     ${data.map(m => `
@@ -53,5 +61,78 @@
       }).join('')}
     </ul>
   </nav>
+
+  <script>
+    document.getElementById('uploadForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const formData = new FormData(this);
+      const fileInput = document.getElementById('fileInput');
+      const uploadBtn = document.getElementById('uploadBtn');
+      const progressDiv = document.getElementById('uploadProgress');
+      const progressBar = document.getElementById('progressBar');
+      const progressText = document.getElementById('progressText');
+
+      if (!fileInput.files.length) {
+        alert('Please select files to upload');
+        return;
+      }
+
+      // Show progress bar and disable button
+      progressDiv.style.display = 'block';
+      uploadBtn.disabled = true;
+      uploadBtn.textContent = 'Uploading...';
+      progressBar.style.width = '0%';
+      progressText.textContent = 'Preparing upload...';
+
+      const xhr = new XMLHttpRequest();
+
+      xhr.upload.addEventListener('progress', function(e) {
+        if (e.lengthComputable) {
+          const percentComplete = (e.loaded / e.total) * 100;
+          progressBar.style.width = percentComplete + '%';
+          progressText.textContent = 'Uploading... ' + Math.round(percentComplete) + '%';
+        }
+      });
+
+      xhr.addEventListener('load', function() {
+        if (xhr.status === 200) {
+          progressText.textContent = 'Upload complete! Refreshing page...';
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        } else {
+          try {
+            const response = JSON.parse(xhr.responseText);
+            alert('Upload failed: ' + (response.message || 'Unknown error'));
+          } catch (e) {
+            alert('Upload failed: ' + xhr.statusText);
+          }
+          // Reset form
+          progressDiv.style.display = 'none';
+          uploadBtn.disabled = false;
+          uploadBtn.textContent = 'Upload';
+        }
+      });
+
+      xhr.addEventListener('error', function() {
+        alert('Upload failed: Network error');
+        progressDiv.style.display = 'none';
+        uploadBtn.disabled = false;
+        uploadBtn.textContent = 'Upload';
+      });
+
+      xhr.addEventListener('abort', function() {
+        alert('Upload cancelled');
+        progressDiv.style.display = 'none';
+        uploadBtn.disabled = false;
+        uploadBtn.textContent = 'Upload';
+      });
+
+      xhr.open('POST', '/admin/media/upload');
+      xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+      xhr.send(formData);
+    });
+  </script>
 ` }) %>
 

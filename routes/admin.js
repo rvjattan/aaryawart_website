@@ -98,9 +98,17 @@ const handleUploadErrors = (err, req, res, next) => {
     }
 
     if (isHtml && req.path === '/media/upload') {
-      const query = new URLSearchParams(req.query);
-      query.set('error', message);
-      return res.redirect(`/admin/media?${query.toString()}`);
+      // Check if this is an AJAX request
+      const isAjax = req.headers['x-requested-with'] === 'XMLHttpRequest' ||
+                     req.headers.accept && req.headers.accept.includes('application/json');
+
+      if (isAjax) {
+        return res.status(400).json({ success: false, message });
+      } else {
+        const query = new URLSearchParams(req.query);
+        query.set('error', message);
+        return res.redirect(`/admin/media?${query.toString()}`);
+      }
     }
 
     if (err.code === 'LIMIT_FILE_SIZE' || err.code === 'FILE_TOO_LARGE') {
@@ -509,7 +517,16 @@ uploadRouter.post(
         });
         saved.push(media);
       }
-      res.redirect('/admin/media');
+
+      // Check if this is an AJAX request
+      const isAjax = req.headers['x-requested-with'] === 'XMLHttpRequest' ||
+                     req.headers.accept && req.headers.accept.includes('application/json');
+
+      if (isAjax) {
+        res.json({ success: true, message: 'Files uploaded successfully', files: saved });
+      } else {
+        res.redirect('/admin/media');
+      }
     } catch (err) {
       next(err);
     }
