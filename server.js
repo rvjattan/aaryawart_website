@@ -12,6 +12,7 @@ const bodyParser = require('body-parser');
 const apiRoutes = require('./routes/api');
 const { adminRoutes, adminUploadRoutes } = require('./routes/admin');
 const { csrfProtection, csrfTokenMiddleware } = require('./middleware/csrf');
+const { uploadsDir } = require('./config/uploads');
 const blogModel = require('./models/blogModel');
 const mediaModel = require('./models/mediaModel');
 const statsModel = require('./models/statsModel');
@@ -25,15 +26,19 @@ const app = express();
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Ensure uploads directory exists for file serving and uploads
-const uploadsDir = process.env.UPLOADS_DIR || (process.env.VERCEL ? '/tmp/uploads' : path.join(__dirname, 'uploads'));
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
 // Static files
 app.use('/static', express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(uploadsDir));
+
+// Fallback route for uploads when express.static does not serve a requested file.
+app.get('/uploads/*', (req, res, next) => {
+  const requestedPath = req.params[0];
+  const fileToSend = path.join(uploadsDir, requestedPath);
+  if (fs.existsSync(fileToSend) && fs.statSync(fileToSend).isFile()) {
+    return res.sendFile(fileToSend);
+  }
+  next();
+});
 
 // Security & logging
 // ✅ Configure comprehensive security headers

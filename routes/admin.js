@@ -13,16 +13,13 @@ const mediaModel = require('../models/mediaModel');
 const siteSettingsModel = require('../models/siteSettingsModel');
 const contentModel = require('../models/contentModel');
 const testimonialModel = require('../models/testimonialModel');
+const { uploadsDir } = require('../config/uploads');
 
 const router = express.Router();
 const uploadRouter = express.Router();
 
-// Ensure admin upload storage uses the same directory as the public /uploads static route.
-const uploadDir = process.env.UPLOADS_DIR || (process.env.VERCEL ? '/tmp/uploads' : path.join(__dirname, '..', 'uploads'));
-
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
+// Use the shared uploads directory configuration.
+const uploadDir = uploadsDir;
 
 // ✅ Whitelist of allowed file extensions and MIME types
 const ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.pdf'];
