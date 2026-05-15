@@ -2,9 +2,20 @@ const fs = require('fs');
 const path = require('path');
 
 const uploadsDir = process.env.UPLOADS_DIR || (process.env.VERCEL ? '/tmp/uploads' : path.join(__dirname, '..', 'uploads'));
+const resolvedUploadsDir = path.resolve(uploadsDir);
 
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
+console.log(`[uploads] uploadsDir resolved to: ${resolvedUploadsDir}`);
+
+if (!fs.existsSync(resolvedUploadsDir)) {
+  fs.mkdirSync(resolvedUploadsDir, { recursive: true });
+}
+
+const tempTestFile = path.join(resolvedUploadsDir, `.upload-write-test-${Date.now()}.tmp`);
+try {
+  fs.writeFileSync(tempTestFile, 'ok');
+  fs.unlinkSync(tempTestFile);
+} catch (err) {
+  throw new Error(`[uploads] Cannot write to uploads directory: ${resolvedUploadsDir}. Ensure UPLOADS_DIR exists and is writable. Original error: ${err.message}`);
 }
 
 if (process.env.VERCEL) {
@@ -12,6 +23,6 @@ if (process.env.VERCEL) {
 }
 
 module.exports = {
-  uploadsDir,
+  uploadsDir: resolvedUploadsDir,
   uploadsUrl: '/uploads',
 };

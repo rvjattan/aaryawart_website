@@ -35,7 +35,7 @@ app.get('/uploads/*', (req, res, next) => {
   const requestedPath = req.params[0];
   const fileToSend = path.join(uploadsDir, requestedPath);
   if (fs.existsSync(fileToSend) && fs.statSync(fileToSend).isFile()) {
-    return res.sendFile(fileToSend);
+    return res.sendFile(fileToSend, { root: '/' });
   }
   next();
 });
