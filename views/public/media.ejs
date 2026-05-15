@@ -146,18 +146,26 @@
 
       <h2 class="mb-3">Photo Gallery</h2>
       <div class="row row-cols-2 row-cols-md-4 g-3">
-        <div class="col">
-          <img src="/static/images/gallery1.jpg" class="img-fluid rounded" alt="Gallery 1" />
-        </div>
-        <div class="col">
-          <img src="/static/images/gallery2.jpg" class="img-fluid rounded" alt="Gallery 2" />
-        </div>
-        <div class="col">
-          <img src="/static/images/gallery3.jpg" class="img-fluid rounded" alt="Gallery 3" />
-        </div>
-        <div class="col">
-          <img src="/static/images/gallery4.jpg" class="img-fluid rounded" alt="Gallery 4" />
-        </div>
+        <% if (mediaImages && mediaImages.length) { %>
+          <% mediaImages.forEach(function(image) { %>
+            <div class="col">
+              <img src="<%= image.file_path %>" class="img-fluid rounded" alt="<%= escapeHtml(image.filename) %>" onerror="this.onerror=null;this.style.display='none'" />
+            </div>
+          <% }); %>
+        <% } else { %>
+          <div class="col">
+            <img src="/static/images/gallery1.jpg" class="img-fluid rounded" alt="Gallery 1" />
+          </div>
+          <div class="col">
+            <img src="/static/images/gallery2.jpg" class="img-fluid rounded" alt="Gallery 2" />
+          </div>
+          <div class="col">
+            <img src="/static/images/gallery3.jpg" class="img-fluid rounded" alt="Gallery 3" />
+          </div>
+          <div class="col">
+            <img src="/static/images/gallery4.jpg" class="img-fluid rounded" alt="Gallery 4" />
+          </div>
+        <% } %>
       </div>
 
       <hr class="my-4" />

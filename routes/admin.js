@@ -17,10 +17,8 @@ const testimonialModel = require('../models/testimonialModel');
 const router = express.Router();
 const uploadRouter = express.Router();
 
-// ✅ Use /tmp on Vercel (the only writable directory), local path otherwise
-const uploadDir = process.env.VERCEL
-  ? '/tmp/uploads'
-  : path.join(__dirname, '..', 'uploads');
+// Ensure admin upload storage uses the same directory as the public /uploads static route.
+const uploadDir = process.env.UPLOADS_DIR || (process.env.VERCEL ? '/tmp/uploads' : path.join(__dirname, '..', 'uploads'));
 
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });

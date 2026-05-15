@@ -13,6 +13,7 @@ const apiRoutes = require('./routes/api');
 const { adminRoutes, adminUploadRoutes } = require('./routes/admin');
 const { csrfProtection, csrfTokenMiddleware } = require('./middleware/csrf');
 const blogModel = require('./models/blogModel');
+const mediaModel = require('./models/mediaModel');
 const statsModel = require('./models/statsModel');
 const siteSettingsModel = require('./models/siteSettingsModel');
 const contentModel = require('./models/contentModel');
@@ -25,7 +26,7 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // Ensure uploads directory exists for file serving and uploads
-const uploadsDir = path.join(__dirname, 'uploads');
+const uploadsDir = process.env.UPLOADS_DIR || (process.env.VERCEL ? '/tmp/uploads' : path.join(__dirname, 'uploads'));
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
@@ -199,10 +200,14 @@ app.get('/activities', (req, res) => {
 
 app.get('/media', async (req, res, next) => {
   try {
-    const blogs = await blogModel.getBlogs({ page: 1, limit: 20, status: 'PUBLISHED' });
+    const [blogs, media] = await Promise.all([
+      blogModel.getBlogs({ page: 1, limit: 20, status: 'PUBLISHED' }),
+      mediaModel.getMedia({ page: 1, limit: 40, type: 'image/' }),
+    ]);
     res.render('public/media', {
       title: 'Media & Publications',
       blogs: blogs.data || [],
+      mediaImages: media.data || [],
     });
   } catch (err) {
     next(err);
