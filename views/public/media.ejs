@@ -120,7 +120,7 @@
                 <div class="col">
                   <div class="card h-100 cursor-pointer blog-card" data-blog-id="<%= blog.id %>">
                     <% if (imageSrc) { %>
-                      <img src="<%= imageSrc %>" class="card-img-top" alt="<%= escapeHtml(blog.title) %>" onerror="this.onerror=null;this.src='/static/images/logo.png'" />
+                      <img src="<%= imageSrc %>" class="card-img-top" alt="<%= escapeHtml(blog.title) %>" onerror="this.onerror=null;this.style.display='none'" />
                     <% } %>
                     <div class="card-body d-flex flex-column">
                       <h5 class="card-title"><%= escapeHtml(blog.title) %></h5>
@@ -307,7 +307,7 @@
                 <p class="text-muted">
                   <small><strong>By ${escapeText(blog.author)}</strong> • ${escapeText(blog.category || 'General')} • ${escapeText(formatDate(blog.publish_date))}</small>
                 </p>
-                ${blog.featured_image ? `<img src="${getImageSrc(blog.featured_image)}" class="img-fluid mb-3 rounded" alt="${escapeText(blog.title)}" onerror="this.onerror=null;this.src='/static/images/logo.png'" />` : ''}
+                ${blog.featured_image ? `<img src="${getImageSrc(blog.featured_image)}" class="img-fluid mb-3 rounded" alt="${escapeText(blog.title)}" onerror="this.onerror=null;this.style.display='none'" />` : ''}
                 <div class="blog-content">
                   ${blog.content || ''}
                 </div>
@@ -331,7 +331,7 @@
             return `
               <div class="col">
                 <div class="card h-100 cursor-pointer blog-card" data-blog-id="${blog.id}">
-                  ${imageSrc ? `<img src="${imageSrc}" class="card-img-top" alt="${escapeText(blog.title)}" onerror="this.onerror=null;this.src='/static/images/logo.png'" />` : ''}
+                  ${imageSrc ? `<img src="${imageSrc}" class="card-img-top" alt="${escapeText(blog.title)}" onerror="this.onerror=null;this.style.display='none'" />` : ''}
                   <div class="card-body d-flex flex-column">
                     <h5 class="card-title">${escapeText(blog.title)}</h5>
                     <p class="card-text text-muted small mb-2">${escapeText(blog.category || 'General')} • ${escapeText(formatDate(blog.publish_date))}</p>
